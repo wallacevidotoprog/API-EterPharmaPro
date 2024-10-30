@@ -1,0 +1,27 @@
+{
+  "name": "api-eterpharmapro",
+  "version": "1.0.0",
+  "main": "/dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "watch": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "start": "node ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.8.4",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "api-eterpharmapro": "file:",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  }
+}
