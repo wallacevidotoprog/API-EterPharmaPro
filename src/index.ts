@@ -1,13 +1,11 @@
-import express, { Request, Response } from 'express';
-
-const app = express();
-const PORT = 3000;
-
-app.get('/', (req: Request, res: Response) => {
-    res.send('Hello, Express with TypeScript! cu');
-});
-
+import express from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
+const server = express();
+const routers = require('./routers/index');
+server.use(express.json());
+server.use('/api',routers);
  
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+server.listen(process.env.PORT_SERVER, () => {
+    console.log(`\x1b[33m[SERVER]\x1b[36m Server na porta ${process.env.PORT_SERVER}: http://localhost:${process.env.PORT_SERVER}/api \x1b[0m`); 
 });
