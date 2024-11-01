@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router} from 'express';
 import {database} from '../Firebase/FirebaseDb'
 
 const routerTeste = Router();
