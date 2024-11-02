@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy-data",
+    "copy-data": "copy src\\Firebase\\serviceAccountKey.json dist\\Firebase\\serviceAccountKey.json",
     "dev": "tsx src/index.ts",
     "watch": "ts-node-dev --respawn --transpile-only src/index.ts",
     "start": "node ./dist/index.js"
@@ -15,6 +16,7 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.8.4",
+    "copyfiles": "^2.4.1",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
