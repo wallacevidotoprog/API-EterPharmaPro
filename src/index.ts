@@ -14,6 +14,12 @@ server.get("/api/connected", (req, res) => {
   });
 });
 
+server.get("/api/danieli_zoli_simoes", (req, res) => {
+  res.status(200).json({
+    MENSSAGEM: "Eu te amo meu amor =D S2"    
+  });
+});
+
 server.listen(process.env.PORT_SERVER || 3000, () => {
   console.log(
     `\x1b[33m[SERVER]\x1b[36m Server na porta ${process.env.PORT_SERVER}: http://localhost:${process.env.PORT_SERVER|| 3000}/api \x1b[0m`
