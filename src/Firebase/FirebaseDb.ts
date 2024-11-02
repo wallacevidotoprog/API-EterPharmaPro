@@ -1,14 +1,13 @@
 import admin from "firebase-admin";
 
-var serviceAccount = require("../Firebase/serviceAccountKey.json");
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string);
 
 let isConnected: boolean = false;
  
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://eterpharma-default-rtdb.firebaseio.com",
+  databaseURL: process.env.DATABASEURL,
 });
-
 const database = admin.database();
 async function testConnection() {
   try {
