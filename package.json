@@ -1,12 +1,12 @@
 {
   "name": "api-eterpharmapro",
   "version": "1.0.0",
-  "main": "/dist/index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
     "watch": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "start": "node ."
+    "start": "node ./dist/index.js"
   },
   "keywords": [],
   "author": "",
