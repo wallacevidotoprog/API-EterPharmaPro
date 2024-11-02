@@ -1,29 +1,34 @@
-import { IEntrega } from "../Interface/IEntrega";
+import { IDelivery } from "../Interface/IDelivery";
 import { database } from "../Firebase/FirebaseDb";
 
-export class FirebaseService {
- 
-  async insertEntrega(entrega: IEntrega): Promise<string> {
-    const ref = database.ref("DELIVERY").push();
+export class FirebaseService<T> {
+  private table: string;
+
+  constructor(table: string) {
+    this.table = table;
+  }
+
+  async INSERT(entrega: T): Promise<string> {
+    const ref = database.ref(this.table).push();
     await ref.set(entrega);
     return ref.key ?? "";
   }
 
-  async updateEntrega(id: string, entrega: IEntrega): Promise<void> {
-    await database.ref(`DELIVERY/${id}`).set(entrega);
+  async UPDATE(id: string, input: T): Promise<void> {
+    await database.ref(`${this.table}}/${id}`).set(input);
   }
 
-  async deleteEntrega(id: string): Promise<void> {
-    await database.ref(`DELIVERY/${id}`).remove();
+  async DELETE(id: string): Promise<void> {
+    await database.ref(`${this.table}/${id}`).remove();
   }
 
-  async getEntrega(id: string): Promise<IEntrega | null> {
-    const snapshot = await database.ref(`DELIVERY/${id}`).once("value");
-    return snapshot.exists() ? (snapshot.val() as IEntrega) : null;
+  async GET(id: string): Promise<T | null> {
+    const snapshot = await database.ref(`${this.table}/${id}`).once("value");
+    return snapshot.exists() ? (snapshot.val() as T) : null;
   }
 
-  async getAllEntregas(): Promise<{ [key: string]: IEntrega }> {
-    const snapshot = await database.ref("DELIVERY").once("value");
+  async GETALL(): Promise<{ [key: string]: T }> {
+    const snapshot = await database.ref(this.table).once("value");
     return snapshot.val() || {};
   }
 }
