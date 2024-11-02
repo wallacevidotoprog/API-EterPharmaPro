@@ -1,7 +1,7 @@
 import { IDelivery } from "../Interface/IDelivery";
 import { database } from "../Firebase/FirebaseDb";
 
-export class FirebaseService<T> {
+export class FirebaseService<T extends object> {
   private table: string;
 
   constructor(table: string) {
@@ -15,7 +15,21 @@ export class FirebaseService<T> {
   }
 
   async UPDATE(id: string, input: T): Promise<void> {
-    await database.ref(`${this.table}}/${id}`).set(input);
+    const snapshot = await database.ref(`${this.table}/${id}`).once("value");
+    const existingData = snapshot.val as T;
+
+    const updates: Partial<T> = {};
+
+    (Object.keys(input) as (keyof T)[]).forEach((key) => {
+      if (input[key] !== existingData[key]) {
+        updates[key] = input[key];
+      }
+    });
+
+    if (Object.keys(updates).length > 0) {
+      await database.ref(`${this.table}/${id}`).update(updates);
+    }
+    //   await database.ref(`${this.table}}/${id}`).set(input);
   }
 
   async DELETE(id: string): Promise<void> {

@@ -1,11 +1,12 @@
+import { IUsers } from './../Interface/IUsers';
 import { IResponseBase } from "./../Interface/IResponseBase";
 import { Router } from "express";
 import { FirebaseService } from "../Class/FirebaseServiceClass";
-import { IUsers } from "../Interface/IUsers";
 
 const routerUser = Router();
 
 const firebaseService = new FirebaseService<IUsers>("USERS");
+
 
 routerUser.post("/users", async (req, res) => {
   try {
