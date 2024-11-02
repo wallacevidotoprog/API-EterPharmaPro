@@ -1,7 +1,7 @@
 {
   "name": "api-eterpharmapro",
   "version": "1.0.0",
-  "main": "./dist/index.js",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
