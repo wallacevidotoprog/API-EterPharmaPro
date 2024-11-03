@@ -7,26 +7,38 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            padding: 20px;
         }
         #messages {
             border: 1px solid #ccc;
             padding: 10px;
             height: 200px;
-            overflow-y: scroll;
+            overflow-y: auto;
         }
-        #messageInput {
-            width: 80%;
+        #clientList {
+            list-style-type: none;
+            padding: 0;
         }
     </style>
 </head>
 <body>
-    <h1>WebSocket Client</h1>
-    <div id="messages"></div>
-    <input type="text" id="messageInput" placeholder="Digite sua mensagem..." />
-    <button id="sendMessage">Enviar</button>
+
+    <h1>Cliente WebSocket</h1>
+    <div>
+        <h2>Mensagens</h2>
+        <div id="messages"></div>
+        <input type="text" id="messageInput" placeholder="Digite sua mensagem" />
+        <button id="sendMessage">Enviar Mensagem</button>
+    </div>
+
+    <div>
+        <h2>Clientes Conectados</h2>
+        <ul id="clientList"></ul>
+    </div>
 
     <script>
-        const webSocket = new WebSocket("ws://api-eterpharmapro.onrender.com");
+        const webSocket = new WebSocket("wss://api-eterpharmapro.onrender.com/");
+        let clientId; // Variável para armazenar o ID do cliente
 
         // Conexão estabelecida
         webSocket.onopen = () => {
@@ -35,8 +47,20 @@
 
         // Recebendo mensagens
         webSocket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
             const messagesDiv = document.getElementById("messages");
-            messagesDiv.innerHTML += `<p>${event.data}</p>`;
+
+            // Se a mensagem contiver o clientId
+            if (data.clientId) {
+                clientId = data.clientId; // Armazena o clientId
+                messagesDiv.innerHTML += `<p>Seu ID: ${clientId}</p>`;
+            } else if (data.type === 'clientList') {
+                // Atualiza a lista de clientes conectados
+                updateClientList(data.clients);
+            } else {
+                messagesDiv.innerHTML += `<p>${data.message}</p>`;
+            }
+
             messagesDiv.scrollTop = messagesDiv.scrollHeight; // Rola para o final
         };
 
@@ -54,11 +78,24 @@
         document.getElementById("sendMessage").onclick = () => {
             const input = document.getElementById("messageInput");
             const message = input.value;
-            if (message) {
-                webSocket.send(message);
+
+            // Verifica se a mensagem é uma string
+            if (typeof message === 'string' && message.trim() !== '') {
+                webSocket.send(message); // Envia a mensagem como string para o servidor
                 input.value = ''; // Limpa o campo de entrada
             }
         };
+
+        // Função para atualizar a lista de clientes
+        function updateClientList(clients) {
+            const clientListDiv = document.getElementById("clientList");
+            clientListDiv.innerHTML = ''; // Limpa a lista atual
+            clients.forEach(client => {
+                const li = document.createElement("li");
+                li.textContent = client; // Adiciona o ID do cliente à lista
+                clientListDiv.appendChild(li);
+            });
+        }
     </script>
 </body>
 </html>
