@@ -1,5 +1,11 @@
 import admin from "firebase-admin";
+import dotenv from 'dotenv';
 
+dotenv.config();
+
+if (!process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+  throw new Error("FIREBASE_SERVICE_ACCOUNT_KEY não está definida no .env");
+}
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string);
 
 let isConnected: boolean = false;

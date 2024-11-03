@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 200px;
+            overflow-y: scroll;
+        }
+        #messageInput {
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Client</h1>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Digite sua mensagem..." />
+    <button id="sendMessage">Enviar</button>
+
+    <script>
+        const webSocket = new WebSocket("ws://192.168.1.6:3000");
+
+        // Conexão estabelecida
+        webSocket.onopen = () => {
+            console.log("WebSocket aberto.");
+        };
+
+        // Recebendo mensagens
+        webSocket.onmessage = (event) => {
+            const messagesDiv = document.getElementById("messages");
+            messagesDiv.innerHTML += `<p>${event.data}</p>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Rola para o final
+        };
+
+        // Tratamento de erros
+        webSocket.onerror = (error) => {
+            console.error(`Erro: ${error.message}`);
+        };
+
+        // Conexão fechada
+        webSocket.onclose = () => {
+            console.log("WebSocket fechado.");
+        };
+
+        // Enviar mensagem
+        document.getElementById("sendMessage").onclick = () => {
+            const input = document.getElementById("messageInput");
+            const message = input.value;
+            if (message) {
+                webSocket.send(message);
+                input.value = ''; // Limpa o campo de entrada
+            }
+        };
+    </script>
+</body>
+</html>
