@@ -35,6 +35,7 @@ app.get("/api/connected", (req, res) => {
 
 interface Client {
   id: string;
+  name?: string;
   sockets: WebSocket | any;
 }
 
@@ -54,21 +55,50 @@ wss.on("connection", (ws) => {
   ws.on("message", (message) => {
     console.log(`Received from ${clientId}: ${message}`);
     let decodedMessage: string;
+
     if (Buffer.isBuffer(message)) {
-      decodedMessage = message.toString("utf8"); // Converte Buffer para string
+      decodedMessage = message.toString("utf8");
     } else {
-      decodedMessage = message as unknown as string; // Assume que já é uma string
+      decodedMessage = String(message);
     }
+
+    let messageValue: string | undefined;
+
+    try {
+      // Tenta fazer o parsing do JSON
+      const parsedMessage = JSON.parse(decodedMessage);
+
+      if ("type" in parsedMessage) {
+        if ("type" in parsedMessage && parsedMessage.type === "register") {
+          const client = clients.find((c) => c.id === clientId);
+          if (client) {
+            // Atualiza o nome do cliente
+            client.name = parsedMessage.name;
+            clients.forEach((client) => {
+              client.sockets.send(JSON.stringify({ clients }));
+            });
+            return;
+          }
+        }
+      }
+
+      // Extrai o valor da chave "message", se existir
+      messageValue = parsedMessage.message;
+    } catch (error) {
+      console.error("Mensagem não é um JSON válido:", error);
+      console.log("decodedMessage:", decodedMessage);
+    }
+
     clients.forEach((client) => {
       client.sockets.send(
-        JSON.stringify({ cliente: clientId, message: decodedMessage })
+        JSON.stringify({ senderId: clientId, message: decodedMessage })
       );
     });
 
     // Envie uma mensagem ao cliente a cada 5 segundos
-    const sendMessage = setInterval(() => {
-      ws.send(JSON.stringify({ message: "Hello from server!" }));
-    }, 50000);
+    // const sendMessage = setInterval(() => {
+    //   ws.send(JSON.stringify({ message: "Hello from server!" }));
+    // }, 50000);
 
     ws.on("close", () => {
       console.log(`Client disconnected: ${clientId}`);
@@ -76,7 +106,9 @@ wss.on("connection", (ws) => {
       if (index !== -1) {
         clients.splice(index, 1);
       }
-      //broadcastClientList();
+      clients.forEach((client) => {
+        client.sockets.send(JSON.stringify({ clients }));
+      });
     });
   });
 
