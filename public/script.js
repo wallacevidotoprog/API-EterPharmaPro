@@ -1,7 +1,7 @@
 const messagesDiv = document.getElementById("messages");
 const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
-const socket = new WebSocket("https://api-eterpharmapro.onrender.com"); // URL do seu servidor WebSocket
+const socket = new WebSocket("ws://192.168.1.6:3000/socket"); // URL do seu servidor WebSocket
 
 let uidClient = "";
 
@@ -21,10 +21,10 @@ socket.addEventListener("open", () => {
   // Envia a mensagem de registro ao servidor
   const registerMessage = {
     type: "register",
-    data: {
+    user: {
       ID: 123456789,
       ID_LOJA: 1515,
-      NOME: "Miranda Vidoto",
+      NOME: "Web",
       PASS: "1223",
       FUNCAO: "Dev",
       STATUS: true,
@@ -36,15 +36,25 @@ socket.addEventListener("open", () => {
 // Evento de recebimento de mensagens do servidor
 socket.addEventListener("message", (event) => {
   const message = JSON.parse(event.data);
-    console.log(message);
-    
+  console.log(message);
+
   if (message.type === "register") {
-    uidClient = message.UID
+    uidClient = message.uid;
+    return;
   }
 
+  if (message.type === "online"&& uidClient !== message.uid) {
+    addMessage(message.name + " Online", false);
+    return;
+  }
+  if (message.type === "offline"&& uidClient !== message.uid) {
+    addMessage(message.name + " Offline", false);
+    return;
+  }
   // Verifica o tipo da mensagem recebida
-  if (message.type === "message" && uidClient !==message.data.UID) {
-    addMessage(message.data.NAME + ":" + message.messege, false); // Adiciona mensagem recebida
+  if (message.type === "message" && uidClient !== message.uid) {
+    addMessage(message.name + ":" + message.message, false); // Adiciona mensagem recebida
+    return;
   }
 });
 

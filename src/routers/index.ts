@@ -3,10 +3,10 @@ import { Router } from "express";
 import delivery from "../controller/DeliveryController";
 import users from "../controller/UserController";
 
-const router = Router();
+const routerApp = Router();
 
 //router.use(routerTeste)
-router.use(delivery);
-router.use(users);
+routerApp.use(delivery);
+routerApp.use(users);
 
-module.exports = router;
+module.exports = routerApp;

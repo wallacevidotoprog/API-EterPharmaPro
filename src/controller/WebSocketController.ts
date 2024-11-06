@@ -1,16 +1,19 @@
+import { IMessageWebSocker } from "./../Interface/IMessageWebSocker";
 import { IUsers } from "./../Interface/IUsers";
 import { Request } from "express";
 import { TypesReciverWebSocketEnum } from "./../Enum/TypesReciverWebSocketEnum";
 import { Server } from "http";
 import { Server as WebSocketServer, WebSocket } from "ws";
-import { IMessageWebSocker } from "../Interface/IMessageWebSocker";
 import { v4 as uuidv4 } from "uuid";
 import { IUserWS } from "../Interface/IUserWS";
 
 let clients: IUserWS[] = [];
 
 export function InitializerWebSocker(server: Server) {
-  const wss = new WebSocketServer({ server });
+  const wss = new WebSocketServer({ server, path: "/socket" });
+
+  // Enviar dados binários ao cliente imagens, áudio ou outros
+  //ws.send(dadosBinarios, { binary: true });
 
   wss.on("connection", (ws: WebSocket, request: Request) => {
     const uid = uuidv4();
@@ -21,21 +24,24 @@ export function InitializerWebSocker(server: Server) {
 
     ws.on("message", (data: string) => {
       const message: IMessageWebSocker = JSON.parse(data);
-
+      console.log(message);
+      
       switch (message.type) {
         case TypesReciverWebSocketEnum.Register:
+          console.log(message.user);
           clients.forEach((dt) => {
             if (dt.UID === newCliente.UID) {
-              dt.USER = { ...message.data };
+              dt.USER = { ...message.user };              
             }
           });
-          ws.send(
-            JSON.stringify({
-              type: TypesReciverWebSocketEnum.Register,
-              UID: uid,
-            })
-          );
+          
+          const msgRegister: IMessageWebSocker = {
+            type: TypesReciverWebSocketEnum.Register,
+            uid: uid,
+          };
+          ws.send(JSON.stringify(msgRegister));
           ws.send(ListClients());
+          BroadcastUserOnline(newCliente.USER?.NOME ?? "Usuário anônimo",uid);
           break;
 
         case TypesReciverWebSocketEnum.Message:
@@ -44,7 +50,7 @@ export function InitializerWebSocker(server: Server) {
 
         case TypesReciverWebSocketEnum.MessagePrivate:
           if (message.id_msgprivete !== undefined) {
-            MessageBy(message.id_msgprivete, message.message ?? "", newCliente);
+            MessageBy(message.id_msgprivete, message.message ?? "", newCliente,);
           }
           break;
       }
@@ -52,76 +58,72 @@ export function InitializerWebSocker(server: Server) {
 
     ws.on("close", () => {
       console.log("Cliente desconectado: " + uid);
+      BroadcastUserOffline(newCliente.USER?.NOME ?? "Usuário anônimo",uid);
       clients = clients.filter((c) => c.UID !== uid);
       ws.send(ListClients());
     });
   });
 
   function ListClients(): string {
-    const tempC = JSON.stringify(getClientsJson());
-    console.log(tempC);
-
-    return JSON.stringify({
+    const data: IMessageWebSocker = {
       type: TypesReciverWebSocketEnum.Clients,
-      clients: tempC, //verificar se esta certo
-    });
+      data: JSON.stringify(getClientsJson()),
+    };
+    return JSON.stringify(data);
   }
 
-  function BroadcastUserOnline(name: string) {
+  function BroadcastUserOnline(name: string, uid: string) {
+    const message: IMessageWebSocker = {
+      type: TypesReciverWebSocketEnum.Online,
+      name: name,
+      uid: uid,
+    };
     clients.forEach((client) => {
       if (client.WS.readyState === WebSocket.OPEN) {
-        client.WS.send(
-          JSON.stringify({
-            type: TypesReciverWebSocketEnum.Online,
-            messege: name,
-          })
-        );
+        client.WS.send(JSON.stringify(message));
+        client.WS.send(ListClients());
+
       }
     });
   }
 
-  function BroadcastUserOffline(name: string) {
+  function BroadcastUserOffline(name: string, uid: string) {
+    const message: IMessageWebSocker = {
+      type: TypesReciverWebSocketEnum.Offline,
+      name: name,
+      uid: uid,
+    };
     clients.forEach((client) => {
       if (client.WS.readyState === WebSocket.OPEN) {
-        client.WS.send(
-          JSON.stringify({
-            type: TypesReciverWebSocketEnum.Offline,
-            messege: name,
-          })
-        );
+        client.WS.send(JSON.stringify(message));
+        client.WS.send(ListClients());
       }
     });
   }
 
   function MessageAll(msg: string, userSend: IUserWS) {
+    const message: IMessageWebSocker = {
+      type: TypesReciverWebSocketEnum.Message,
+      message: msg,
+      uid: userSend.UID,
+      name: userSend.USER?.NOME ?? "",
+    };
     clients.forEach((client) => {
       if (client.WS.readyState === WebSocket.OPEN) {
-        client.WS.send(
-          JSON.stringify({
-            type: TypesReciverWebSocketEnum.Message,
-            messege: msg,
-            data: {
-              UID: userSend.UID,
-              NAME: userSend.USER?.NOME,
-            },
-          })
-        );
+        client.WS.send(JSON.stringify(message));
       }
     });
   }
   function MessageBy(uid: string, msg: string, userSend: IUserWS) {
+    const message: IMessageWebSocker = {
+      type: TypesReciverWebSocketEnum.Message,
+      message: msg,
+      uid: userSend.UID,
+      name: userSend.USER?.NOME ?? "",
+    };
     clients.forEach((user) => {
       if (user.WS.readyState === WebSocket.OPEN && user.UID === uid) {
-        user.WS.send(
-          JSON.stringify({
-            type: TypesReciverWebSocketEnum.Message,
-            messege: msg,
-            data: {
-              UID: userSend.UID,
-              NAME: userSend.USER?.NOME,
-            },
-          })
-        );
+        user.WS.send(JSON.stringify(message));
       }
     });
   }
