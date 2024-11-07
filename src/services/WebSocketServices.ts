@@ -1,13 +1,25 @@
-import { IMessageWebSocker } from "./../Interface/IMessageWebSocker";
-import { IUsers } from "./../Interface/IUsers";
+import { IMessageWebSocker } from "../Interface/IMessageWebSocker";
 import { Request } from "express";
-import { TypesReciverWebSocketEnum } from "./../Enum/TypesReciverWebSocketEnum";
+import { TypesReciverWebSocketEnum } from "../Enum/TypesReciverWebSocketEnum";
 import { Server } from "http";
 import { Server as WebSocketServer, WebSocket } from "ws";
 import { v4 as uuidv4 } from "uuid";
 import { IUserWS } from "../Interface/IUserWS";
 
 let clients: IUserWS[] = [];
+
+export function MessageFirebaseNotify( type:TypesReciverWebSocketEnum, msg: string) {
+  const message: IMessageWebSocker = {
+    type:type,
+    message: msg,
+    name: "SERVER",
+  };
+  clients.forEach((client) => {
+    if (client.WS.readyState === WebSocket.OPEN) {
+      client.WS.send(JSON.stringify(message));
+    }
+  });
+}
 
 export function InitializerWebSocker(server: Server) {
   const wss = new WebSocketServer({ server, path: "/socket" });
@@ -25,23 +37,23 @@ export function InitializerWebSocker(server: Server) {
     ws.on("message", (data: string) => {
       const message: IMessageWebSocker = JSON.parse(data);
       console.log(message);
-      
+
       switch (message.type) {
         case TypesReciverWebSocketEnum.Register:
           console.log(message.user);
           clients.forEach((dt) => {
             if (dt.UID === newCliente.UID) {
-              dt.USER = { ...message.user };              
+              dt.USER = { ...message.user };
             }
           });
-          
+
           const msgRegister: IMessageWebSocker = {
             type: TypesReciverWebSocketEnum.Register,
             uid: uid,
           };
           ws.send(JSON.stringify(msgRegister));
           ws.send(ListClients());
-          BroadcastUserOnline(newCliente.USER?.NOME ?? "Usuário anônimo",uid);
+          BroadcastUserOnline(newCliente.USER?.NOME ?? "Usuário anônimo", uid);
           break;
 
         case TypesReciverWebSocketEnum.Message:
@@ -50,7 +62,7 @@ export function InitializerWebSocker(server: Server) {
 
         case TypesReciverWebSocketEnum.MessagePrivate:
           if (message.id_msgprivete !== undefined) {
-            MessageBy(message.id_msgprivete, message.message ?? "", newCliente,);
+            MessageBy(message.id_msgprivete, message.message ?? "", newCliente);
           }
           break;
       }
@@ -58,7 +70,7 @@ export function InitializerWebSocker(server: Server) {
 
     ws.on("close", () => {
       console.log("Cliente desconectado: " + uid);
-      BroadcastUserOffline(newCliente.USER?.NOME ?? "Usuário anônimo",uid);
+      BroadcastUserOffline(newCliente.USER?.NOME ?? "Usuário anônimo", uid);
       clients = clients.filter((c) => c.UID !== uid);
       ws.send(ListClients());
     });
@@ -82,7 +94,6 @@ export function InitializerWebSocker(server: Server) {
       if (client.WS.readyState === WebSocket.OPEN) {
         client.WS.send(JSON.stringify(message));
         client.WS.send(ListClients());
-
       }
     });
   }
@@ -133,4 +144,6 @@ export function InitializerWebSocker(server: Server) {
       NAME: client.USER?.NOME,
     }));
   }
+
+    
 }

@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import { isConnected } from "../Firebase/FirebaseDb";
-import { InitializerWebSocker } from "../controller/WebSocketController";
+import { InitializerWebSocker } from "../services/WebSocketServices";
 import { createServer, Server } from "http";
 import path from "path";
 import dotenv from "dotenv";
@@ -17,7 +17,7 @@ export class AppServer {
     this.websocket();
   }
   private config(): void {
-    this.app.use(express.json());    
+    this.app.use(express.json());
     this.app.use(express.static(path.join(process.cwd(), "/public")));
     this.app.use("/api", require("../routers/index"));
   }

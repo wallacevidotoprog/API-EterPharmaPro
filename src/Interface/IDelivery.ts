@@ -1,11 +1,10 @@
-export interface IDelivery {
-  ID: number | null;
-  UID: string;
-  DATE: string | null;
+import { IFirebaseDb } from "./IFirebaseDb";
+
+export interface IDelivery extends IFirebaseDb {
+  USER_ID: number;
+  DATE: string;
   VALUE: number;
-  KM: number | null;
-  TYPE_DELIVERY: number | null;
-  USER_ID: { ID: number | null; NAME: string };
-  CLIENTE_ID: { ID: number | null; NAME: string };
-  ENDERECO_ID: { ID: number | null; NAME: string; OBS?: string };
+  KM: number;
+  COMPLETED: number;
+  DATE_COMPLETED: number;
 }

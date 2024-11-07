@@ -1,15 +1,15 @@
-import { IResponseBase } from "./../Interface/IResponseBase";
+import { IResponseBase } from "../Interface/IResponseBase";
 import { Router } from "express";
 import { FirebaseService } from "../Class/FirebaseServiceClass";
-import { IDelivery } from "../Interface/IDelivery";
-import {MessageFirebaseNotify} from "../services/WebSocketServices"
+import { IDeliveryInput } from "../Interface/IDeliveryInput";
+import { MessageFirebaseNotify } from "../services/WebSocketServices";
 import { TypesReciverWebSocketEnum } from "../Enum/TypesReciverWebSocketEnum";
 
-const routerDelivery = Router();
+const routerDeliveryImput = Router();
 
-const firebaseService = new FirebaseService<IDelivery>("DELIVERY");
+const firebaseService = new FirebaseService<IDeliveryInput>("DELIVERY_INPUT");
 
-routerDelivery.post("/delivery", async (req, res) => {
+routerDeliveryImput.post("/delivery_input", async (req, res) => {
   try {
     if (
       !req.body ||
@@ -21,11 +21,12 @@ routerDelivery.post("/delivery", async (req, res) => {
         actionResult: false,
       } as IResponseBase<string>);
     }
-    const delivery = req.body as IDelivery;
+    const delivery = req.body as IDeliveryInput;
 
     await firebaseService
       .INSERT(delivery)
       .then((dt) => {
+        MessageFirebaseNotify(TypesReciverWebSocketEnum.NewDelivery ,`NOVA ENTREGA: ${delivery.TYPE_DELIVERY.NAME}`);// melhorar
         res.status(200).json({
           data: dt,
           actionResult: true,
@@ -47,7 +48,7 @@ routerDelivery.post("/delivery", async (req, res) => {
   }
 });
 
-routerDelivery.put("/delivery/:id", async (req, res) => {  
+routerDeliveryImput.put("/delivery_input/:id", async (req, res) => {
   try {
     if (
       !req.body ||
@@ -60,13 +61,12 @@ routerDelivery.put("/delivery/:id", async (req, res) => {
       } as IResponseBase<string>);
     }
 
-    const delivery = req.body as IDelivery;
+    const delivery = req.body as IDeliveryInput;
     const id = req.params["id"];
 
     await firebaseService
       .UPDATE(id, delivery)
       .then((dt) => {
-        MessageFirebaseNotify(TypesReciverWebSocketEnum.FinishDelivery,'Entrega finalizada');// melhorar
         res.status(200).json({
           data: dt,
           actionResult: true,
@@ -88,7 +88,7 @@ routerDelivery.put("/delivery/:id", async (req, res) => {
   }
 });
 
-routerDelivery.delete("/delivery/:id", async (req, res) => {
+routerDeliveryImput.delete("/delivery_input/:id", async (req, res) => {
   try {
     if (!req.params["id"] || Object.keys(req.params["id"]).length === 0) {
       res.status(400).json({
@@ -122,7 +122,7 @@ routerDelivery.delete("/delivery/:id", async (req, res) => {
   }
 });
 
-routerDelivery.get("/delivery/:id", async (req, res) => {
+routerDeliveryImput.get("/delivery_input/:id", async (req, res) => {
   try {
     if (!req.params["id"] || Object.keys(req.params["id"]).length === 0) {
       res.status(400).json({
@@ -155,7 +155,7 @@ routerDelivery.get("/delivery/:id", async (req, res) => {
     } as IResponseBase<typeof undefined>);
   }
 });
-routerDelivery.get("/delivery", async (req, res) => {
+routerDeliveryImput.get("/delivery_input", async (req, res) => {
   try {
     await firebaseService
       .GETALL()
@@ -181,4 +181,4 @@ routerDelivery.get("/delivery", async (req, res) => {
   }
 });
 
-export default routerDelivery;
+export default routerDeliveryImput;
