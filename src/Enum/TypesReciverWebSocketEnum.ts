@@ -5,6 +5,5 @@ export enum TypesReciverWebSocketEnum {
   Clients = "listClients",
   Online = "online",
   Offline = "offline",
-  NewDelivery = "new_delivery",
-  FinishDelivery = "finish_delivery",
+  Delivery = "delivery"
 }

@@ -66,7 +66,7 @@ routerDelivery.put("/delivery/:id", async (req, res) => {
     await firebaseService
       .UPDATE(id, delivery)
       .then((dt) => {
-        MessageFirebaseNotify(TypesReciverWebSocketEnum.FinishDelivery,'Entrega finalizada');// melhorar
+        MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'Entrega finalizada');
         res.status(200).json({
           data: dt,
           actionResult: true,

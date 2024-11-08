@@ -26,7 +26,7 @@ routerDeliveryImput.post("/delivery_input", async (req, res) => {
     await firebaseService
       .INSERT(delivery)
       .then((dt) => {
-        MessageFirebaseNotify(TypesReciverWebSocketEnum.NewDelivery ,`NOVA ENTREGA: ${delivery.TYPE_DELIVERY.NAME}`);// melhorar
+        MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery ,`NOVA ENTREGA: ${delivery.TYPE_DELIVERY.NAME}`);// melhorar
         res.status(200).json({
           data: dt,
           actionResult: true,

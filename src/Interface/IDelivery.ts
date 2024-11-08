@@ -5,6 +5,6 @@ export interface IDelivery extends IFirebaseDb {
   DATE: string;
   VALUE: number;
   KM: number;
-  COMPLETED: number;
+  STATS: number;
   DATE_COMPLETED: number;
 }
