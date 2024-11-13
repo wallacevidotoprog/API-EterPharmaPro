@@ -8,11 +8,12 @@ import { IUserWS } from "../Interface/IUserWS";
 
 let clients: IUserWS[] = [];
 
-export function MessageFirebaseNotify( type:TypesReciverWebSocketEnum, msg: string) {
+export function MessageFirebaseNotify( type:TypesReciverWebSocketEnum, msg: string,data:any=null) {
   const message: IMessageWebSocker = {
     type:type,
     message: msg,
     name: "SERVER",
+    data:data
   };
   clients.forEach((client) => {
     if (client.WS.readyState === WebSocket.OPEN) {

@@ -4,6 +4,7 @@ import { FirebaseService } from "../Class/FirebaseServiceClass";
 import { IDelivery } from "../Interface/IDelivery";
 import {MessageFirebaseNotify} from "../services/WebSocketServices"
 import { TypesReciverWebSocketEnum } from "../Enum/TypesReciverWebSocketEnum";
+import { table } from "console";
 
 const routerDelivery = Router();
 
@@ -66,7 +67,7 @@ routerDelivery.put("/delivery/:id", async (req, res) => {
     await firebaseService
       .UPDATE(id, delivery)
       .then((dt) => {
-        MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'Entrega finalizada');
+        MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'',id);
         res.status(200).json({
           data: dt,
           actionResult: true,
