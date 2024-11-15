@@ -5,10 +5,11 @@ import { Server } from "http";
 import { Server as WebSocketServer, WebSocket } from "ws";
 import { v4 as uuidv4 } from "uuid";
 import { IUserWS } from "../Interface/IUserWS";
+import { IResponseDelivery } from "../Interface/IResponseDelivery";
 
 let clients: IUserWS[] = [];
 
-export function MessageFirebaseNotify( type:TypesReciverWebSocketEnum, msg: string,data:any=null) {
+export function MessageFirebaseNotify( type:TypesReciverWebSocketEnum, msg: string, data:IResponseDelivery) {
   const message: IMessageWebSocker = {
     type:type,
     message: msg,

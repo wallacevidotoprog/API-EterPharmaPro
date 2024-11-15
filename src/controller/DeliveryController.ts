@@ -4,7 +4,7 @@ import { FirebaseService } from "../Class/FirebaseServiceClass";
 import { IDelivery } from "../Interface/IDelivery";
 import {MessageFirebaseNotify} from "../services/WebSocketServices"
 import { TypesReciverWebSocketEnum } from "../Enum/TypesReciverWebSocketEnum";
-import { table } from "console";
+import { ResponseDeliveryEnum } from "../Enum/ResponseDeliveryEnum";
 
 const routerDelivery = Router();
 
@@ -66,8 +66,13 @@ routerDelivery.put("/delivery/:id", async (req, res) => {
 
     await firebaseService
       .UPDATE(id, delivery)
-      .then((dt) => {
-        MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'',id);
+      .then(async (dt) => {
+        MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'',{
+          table:"DELIVERY",
+          type:ResponseDeliveryEnum.UPDATE,
+          IDF:id,
+          data:await firebaseService.GET(id)
+        });
         res.status(200).json({
           data: dt,
           actionResult: true,
