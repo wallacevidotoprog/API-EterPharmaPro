@@ -4,6 +4,7 @@ import { FirebaseService } from "../Class/FirebaseServiceClass";
 import { IDeliveryInput } from "../Interface/IDeliveryInput";
 import { MessageFirebaseNotify } from "../services/WebSocketServices";
 import { TypesReciverWebSocketEnum } from "../Enum/TypesReciverWebSocketEnum";
+import { ResponseDeliveryEnum } from "../Enum/ResponseDeliveryEnum";
 
 const routerDeliveryImput = Router();
 
@@ -26,7 +27,12 @@ routerDeliveryImput.post("/delivery_input", async (req, res) => {
     await firebaseService
       .INSERT(delivery)
       .then((dt) => {
-        MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery ,`NOVA ENTREGA: ${delivery.TYPE_DELIVERY.NAME}`);// melhorar
+        MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'',{
+          table:"DELIVERY_INPUT",
+          type:ResponseDeliveryEnum.INSERT, 
+          IDF:dt,         
+          data:delivery
+        });
         res.status(200).json({
           data: dt,
           actionResult: true,
