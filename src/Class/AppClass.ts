@@ -38,9 +38,9 @@ export class AppServer {
   public StartServer(): void {
     this.server?.listen(process.env.PORT_SERVER || 3000, () => {
       console.log(
-        `\x1b[33m[SERVER]\x1b[36m Server na porta ${
+        `\x1b[33m[SERVER]✅\x1b[36m Server na porta ${
           process.env.PORT_SERVER
-        }: http://localhost:${process.env.PORT_SERVER || 3000}/api \x1b[0m`
+        }: http://localhost:${process.env.PORT_SERVER || 3000}/api \x1b[0m` 
       );
     });
   }

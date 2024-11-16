@@ -1,7 +1,7 @@
 const messagesDiv = document.getElementById("messages");
 const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
-const socket = new WebSocket("ws://192.168.1.5:3000/socket"); // URL do seu servidor WebSocket
+const socket = new WebSocket("https://api-eterpharmapro.onrender.com"); // URL do seu servidor WebSocket
 
 let uidClient = "";
 
