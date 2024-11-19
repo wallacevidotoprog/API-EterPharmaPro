@@ -4,6 +4,8 @@ import { InitializerWebSocker } from "../services/WebSocketServices";
 import { createServer, Server } from "http";
 import path from "path";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
 dotenv.config();
 
 export class AppServer {
@@ -20,6 +22,8 @@ export class AppServer {
     this.app.use(express.json());
     this.app.use(express.static(path.join(process.cwd(), "/public")));
     this.app.use("/api", require("../routers/index"));
+    this.app.use(cookieParser());
+    this.app.use(bodyParser.json());
   }
 
   private websocket(): void {

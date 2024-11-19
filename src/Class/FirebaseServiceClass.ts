@@ -1,4 +1,3 @@
-import { IDelivery } from "../Interface/IDelivery";
 import { database } from "../Firebase/FirebaseDb";
 
 export class FirebaseService<T extends object> {

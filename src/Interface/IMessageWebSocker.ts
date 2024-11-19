@@ -1,5 +1,5 @@
 import { TypesReciverWebSocketEnum } from "../Enum/TypesReciverWebSocketEnum";
-import { IUsers } from "./IUsers";
+import { IUsers } from "./db/IUsers";
 
 export interface IMessageWebSocker {
   type: TypesReciverWebSocketEnum;
