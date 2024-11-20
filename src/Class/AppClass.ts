@@ -1,11 +1,11 @@
 import express, { Application } from "express";
-import { isConnected } from "../Firebase/FirebaseDb";
 import { InitializerWebSocker } from "../services/WebSocketServices";
 import { createServer, Server } from "http";
 import path from "path";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import { isConnected } from "../DatabaseMySql/DataBaseMySql";
 dotenv.config();
 
 export class AppServer {

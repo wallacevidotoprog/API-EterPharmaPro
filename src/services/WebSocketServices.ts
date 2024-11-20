@@ -45,7 +45,7 @@ export function InitializerWebSocker(server: Server) {
           console.log(message.user);
           clients.forEach((dt) => {
             if (dt.UID === newCliente.UID) {
-              dt.USER = { ...message.user };
+              //dt.USER = { ...message.user };
             }
           });
 
@@ -55,7 +55,7 @@ export function InitializerWebSocker(server: Server) {
           };
           ws.send(JSON.stringify(msgRegister));
           ws.send(ListClients());
-          BroadcastUserOnline(newCliente.USER?.NOME ?? "Usuário anônimo", uid);
+          //BroadcastUserOnline(newCliente.USER?.NOME ?? "Usuário anônimo", uid);
           break;
 
         case TypesReciverWebSocketEnum.Message:
@@ -72,7 +72,7 @@ export function InitializerWebSocker(server: Server) {
 
     ws.on("close", () => {
       console.log("Cliente desconectado: " + uid);
-      BroadcastUserOffline(newCliente.USER?.NOME ?? "Usuário anônimo", uid);
+      //BroadcastUserOffline(newCliente.USER?.NOME ?? "Usuário anônimo", uid);
       clients = clients.filter((c) => c.UID !== uid);
       ws.send(ListClients());
     });
@@ -119,7 +119,7 @@ export function InitializerWebSocker(server: Server) {
       type: TypesReciverWebSocketEnum.Message,
       message: msg,
       uid: userSend.UID,
-      name: userSend.USER?.NOME ?? "",
+      //name: userSend.USER?.NOME ?? "",
     };
     clients.forEach((client) => {
       if (client.WS.readyState === WebSocket.OPEN) {
@@ -132,7 +132,7 @@ export function InitializerWebSocker(server: Server) {
       type: TypesReciverWebSocketEnum.Message,
       message: msg,
       uid: userSend.UID,
-      name: userSend.USER?.NOME ?? "",
+      //name: userSend.USER?.NOME ?? "",
     };
     clients.forEach((user) => {
       if (user.WS.readyState === WebSocket.OPEN && user.UID === uid) {
@@ -143,7 +143,7 @@ export function InitializerWebSocker(server: Server) {
   function getClientsJson() {
     return clients.map((client) => ({
       UID: client.UID,
-      NAME: client.USER?.NOME,
+      //NAME: client.USER?.NOME,
     }));
   }
 

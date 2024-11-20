@@ -1,5 +1,4 @@
 import { Router } from "express";
-//import routerTeste from '../controller/teste';
 import delivery from "../controller/DeliveryController";
 import users from "../controller/UserController";
 import DeliveryImput from "../controller/DeliveryInputController";

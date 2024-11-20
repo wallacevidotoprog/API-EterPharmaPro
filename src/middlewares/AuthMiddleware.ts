@@ -2,11 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { JwtUtil } from "../utils/JwtUtil";
 
 export class AuthMiddleware {
-  static authenticate(req: Request, res: Response, next: NextFunction) {
+  static Authenticate(req: Request, res: Response, next: NextFunction):void {
     const token = req.cookies.authToken;
 
     if (!token) {
-      return res.status(401).json({ message: "Não autenticado." });
+      res.status(401).json({ message: "Não autenticado." });
     }
 
     try {

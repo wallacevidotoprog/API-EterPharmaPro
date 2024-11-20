@@ -1,18 +1,22 @@
 import bcrypt from "bcryptjs";
-//usermodel
 import { JwtUtil } from "../utils/JwtUtil";
-import { IUsers } from "../Interface/IUsers";
+import { IUsers } from "../Interface/db/IUsers";
 
 export class AuthService {
-  static async register(email: string, password: string) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await UserModel.create(email, hashedPassword);
+  public static async CryptPass(pass: string): Promise<string> {
+    return await bcrypt.hash(pass, 10);
   }
-  public static async Login(obj: IUsers) {
-    const user = await UserModel.findbyEmal(obj.NOME);
-    if (!user || (await bcrypt.compare(obj.PASS, user, pass))) {
-      throw new Error("Credenciais inválidas");
-    }
-    return JwtUtil.GenerateToken({ obj });
+  
+  public static async GenerateToken(obj: IUsers) {
+    const jwtNew = {
+      id: obj.id,
+      email: obj.email,
+      name: obj.name,
+    };
+    return JwtUtil.GenerateToken({ jwtNew });
+  }
+
+  public static async CryptPassCompare(passReq: string, passServe: string) {
+    return await bcrypt.compare(passReq, passServe);
   }
 }
