@@ -1,4 +1,5 @@
-export interface IResponseBase<T>{
-    data:T,
-    actionResult:boolean
+export interface IResponseBase<T> {
+  message?: string;
+  actionResult: boolean;
+  data?: T;
 }

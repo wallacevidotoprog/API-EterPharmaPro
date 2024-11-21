@@ -1,14 +1,58 @@
+import { IUsers } from "./../Interface/db/IUsers";
 import { IResponseBase } from "./../Interface/IResponseBase";
 import { Router } from "express";
-import { IUsers } from "../Interface/db/IUsers";
 import { AuthMiddleware } from "../middlewares/AuthMiddleware";
 import { AuthService } from "../services/AuthService";
 import { OperationsDbClass } from "../Class/OperationsDbClass";
 import { connection } from "../DatabaseMySql/DataBaseMySql";
+import { ILoginUser } from "../Interface/ILoginUser";
 
 const routerUser = Router();
 const DbQuery = new OperationsDbClass<IUsers>("users");
-routerUser.post("/login", async (req, res) => {});
+routerUser.post("/login", async (req, res) => {
+  try {
+    const objReq: ILoginUser = req.body;
+
+    console.log(objReq);
+    if (!objReq.email || !objReq.pass) {
+      res.status(400).json({
+        message: "Login ou Senha não preenchidos.",
+        actionResult: false,
+      } as IResponseBase<null>);
+    }
+    const [verifyLogin] = await connection?.query<IUsers[]>(
+      DbQuery.GET({ email: objReq.email })
+    );
+    
+    if (Array.isArray(verifyLogin) && verifyLogin.length > 0) {
+      const userTemp: IUsers = verifyLogin[0];
+      console.log(userTemp.pass);
+      const isPasswordValid = await AuthService.CryptPassCompare(
+        objReq.pass,
+        userTemp.pass
+      );
+      
+     
+      if (!isPasswordValid) {
+        res.status(401).json({
+          message: "Credenciais inválidas.",
+          actionResult: false,
+        } as IResponseBase<null>);
+      }
+      
+      res.cookie("authToken", AuthService.GenerateToken(userTemp), { httpOnly: true, secure: false });
+      res.status(200).json({
+        message: "Login bem-sucedido.",
+        actionResult: true,
+      } as IResponseBase<null>);
+
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: error, actionResult: false } as IResponseBase<null>);
+  }
+});
 
 routerUser.post("/signup", async (req, res) => {
   try {
@@ -23,15 +67,26 @@ routerUser.post("/signup", async (req, res) => {
     objUser.pass = await AuthService.CryptPass(objUser.pass);
     console.log("crypt pass:" + objUser.pass);
 
-    await connection?.query(DbQuery.INSERT(objUser)).then((dt)=>{
+    const [result]: any = await connection?.query(DbQuery.INSERT(objUser));
 
-      console.log(dt.insertId);
-    })
-    
+    if (result && result.insertId) {
+      console.log("ID inserido:", result.insertId);
+    } else {
+      console.error("ID inserido não encontrado no resultado.");
+    }
+    // await connection?.query(DbQuery.INSERT(objUser)).then((dt)=>{
 
-    res.status(201).json({ message: "Usuário registrado com sucesso!" });
+    //   console.log(dt.insertId);
+    // })
+
+    res.status(201).json({
+      message: "Usuário registrado com sucesso!",
+      actionResult: true,
+    } as IResponseBase<null>);
   } catch (error) {
-    res.status(500).json({ message: error });
+    res
+      .status(500)
+      .json({ message: error, actionResult: false } as IResponseBase<null>);
   }
 });
 
