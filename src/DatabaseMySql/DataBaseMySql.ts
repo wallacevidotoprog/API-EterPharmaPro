@@ -1,11 +1,12 @@
-import mysql from "mysql2/promise";
+import { Query } from "./../../node_modules/mysql2/typings/mysql/index.d";
+import mysql, { Pool } from "mysql2/promise";
 import dotenv from "dotenv";
 import { Connection } from "mysql2/promise";
 
 dotenv.config();
 
 let isConnected: boolean = false;
-let connection: Connection | null = null;
+let connection: Pool | null = null;
 
 async function connectToDatabase() {
   try {
@@ -15,6 +16,9 @@ async function connectToDatabase() {
       user: process.env.USER,
       password: process.env.PASSWORD,
       database: process.env.DATABASE,
+      waitForConnections: true,
+      //connectionLimit: 10, // Número máximo de conexões no pool
+      //queueLimit: 0, // Sem limite para a fila de conexões
       //ssl: {
       //rejectUnauthorized: false,
       // ca: process.env.CA_CERT_PATH
@@ -23,9 +27,8 @@ async function connectToDatabase() {
       //},
     });
 
-    isConnected = true;
     console.log(
-      "\x1b[33m[MYSQL]\x1b[36m✅ Conexão com o MySQL Database estabelecida com sucesso."
+      "\x1b[33m[MYSQL]\x1b[36m✅ Conexão com o MySQL conexões criado com sucesso."
     );
   } catch (error) {
     isConnected = false;
@@ -35,28 +38,37 @@ async function connectToDatabase() {
     );
   }
 }
-
+function getPool(): Pool {
+  if (!connection) {
+    throw new Error(
+      "O pool de conexões não foi inicializado. Certifique-se de chamar `connectToDatabase()` antes de usá-lo."
+    );
+  }
+  return connection;
+}
 (async () => {
   await connectToDatabase();
+  const pool = getPool();
   try {
     if (connection != null) {
-      await connection.query("SET time_zone = 'America/Sao_Paulo'");
+      isConnected=true;
+      await pool.query("SET time_zone = 'America/Sao_Paulo'");
     }
   } catch (error) {
     console.error(
-      "\x1b[33m[MYSQL-Command]\x1b[36m❌ Erro ao conectar ao MySQL Database:",
-      error.sqlMessage
+      "\x1b[33m[MYSQL-Command]\x1b[36m❌ Erro ao SET time_zone ao MySQL Database:",
+     // error
     );
   }
-  const [rows] = await connection.query("SELECT NOW()");
-  const serverTime = new Date(rows[0]["NOW()"]);
+  const [rows] = await pool.query("SELECT NOW()");
+  const serverTime = new Date((rows as any)[0]["NOW()"]);
   console.log(
     "\x1b[33m[MYSQL-Command]\x1b[36mHora do servidor:",
     serverTime.toLocaleString("pt-BR")
   );
 })();
 
-process.on('SIGINT', async () => {
+process.on("SIGINT", async () => {
   console.log(
     "\x1b[33m[MYSQL-Command]\x1b[36m✅ Encerrando a conexão com o banco de dados..."
   );

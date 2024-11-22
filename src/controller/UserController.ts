@@ -6,46 +6,78 @@ import { AuthService } from "../services/AuthService";
 import { OperationsDbClass } from "../Class/OperationsDbClass";
 import { connection } from "../DatabaseMySql/DataBaseMySql";
 import { ILoginUser } from "../Interface/ILoginUser";
+import { IVerifyAuth } from "../Interface/IVerifyAuth";
 
 const routerUser = Router();
 const DbQuery = new OperationsDbClass<IUsers>("users");
+
+routerUser.get("/verifyAuth", AuthMiddleware.Authenticate, (req, res) => {
+  res.status(201).json({
+    message: "Acesso permitido.",
+    actionResult: true,
+    data:{
+      Authentication:true
+    }
+  } as IResponseBase<IVerifyAuth>);
+});
+
+
 routerUser.post("/login", async (req, res) => {
   try {
     const objReq: ILoginUser = req.body;
 
-    console.log(objReq);
     if (!objReq.email || !objReq.pass) {
       res.status(400).json({
         message: "Login ou Senha não preenchidos.",
         actionResult: false,
       } as IResponseBase<null>);
     }
-    const [verifyLogin] = await connection?.query<IUsers[]>(
+
+    if (!connection) {
+      res.status(500).json({
+        message: "Erro interno: conexão com o banco de dados não estabelecida.",
+        actionResult: false,
+      } as IResponseBase<null>);
+    }
+
+    const [rows, _]: any = await connection?.query(
       DbQuery.GET({ email: objReq.email })
     );
-    
+    const verifyLogin: IUsers[] = rows;
+
+    if (!Array.isArray(verifyLogin) || verifyLogin.length === 0) {
+      res.status(401).json({
+        message: "Credenciais inválidas.",
+        actionResult: false,
+      } as IResponseBase<null>);
+    }
+
     if (Array.isArray(verifyLogin) && verifyLogin.length > 0) {
       const userTemp: IUsers = verifyLogin[0];
-      console.log(userTemp.pass);
+      
       const isPasswordValid = await AuthService.CryptPassCompare(
         objReq.pass,
         userTemp.pass
       );
-      
-     
+
       if (!isPasswordValid) {
         res.status(401).json({
           message: "Credenciais inválidas.",
           actionResult: false,
         } as IResponseBase<null>);
+        return; 
       }
-      
-      res.cookie("authToken", AuthService.GenerateToken(userTemp), { httpOnly: true, secure: false });
+
+      res.cookie("authToken", await AuthService.GenerateToken(userTemp), {
+        httpOnly: true,
+        secure: false,
+        path: "/",
+        maxAge: 3600000,
+      });
       res.status(200).json({
         message: "Login bem-sucedido.",
         actionResult: true,
       } as IResponseBase<null>);
-
     }
   } catch (error) {
     res
@@ -74,10 +106,6 @@ routerUser.post("/signup", async (req, res) => {
     } else {
       console.error("ID inserido não encontrado no resultado.");
     }
-    // await connection?.query(DbQuery.INSERT(objUser)).then((dt)=>{
-
-    //   console.log(dt.insertId);
-    // })
 
     res.status(201).json({
       message: "Usuário registrado com sucesso!",
@@ -90,9 +118,11 @@ routerUser.post("/signup", async (req, res) => {
   }
 });
 
-routerUser.post("/logout", async (req, res) => {
-  res.clearCookie("authToken");
-  res.json({ message: "Logout realizado com sucesso." });
+routerUser.post("/logout",AuthMiddleware.eLogout, async (req, res) => {
+   res.status(200).json({
+    message: "Logout realizado com sucesso.",
+    actionResult: true,
+  } as IResponseBase<null>);
 });
 
 routerUser.get("/protected", AuthMiddleware.Authenticate, (req, res) => {

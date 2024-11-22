@@ -1,14 +1,12 @@
 import { IResponseBase } from "../Interface/IResponseBase";
 import { Router } from "express";
-import { FirebaseService } from "../Class/FirebaseServiceClass";
-import { IDeliveryInput } from "../Interface/IDeliveryInput";
 import { MessageFirebaseNotify } from "../services/WebSocketServices";
 import { TypesReciverWebSocketEnum } from "../Enum/TypesReciverWebSocketEnum";
 import { ResponseDeliveryEnum } from "../Enum/ResponseDeliveryEnum";
 
 const routerDeliveryImput = Router();
 
-const firebaseService = new FirebaseService<IDeliveryInput>("DELIVERY_INPUT");
+//const firebaseService = new FirebaseService<IDeliveryInput>("DELIVERY_INPUT");
 
 routerDeliveryImput.post("/delivery_input", async (req, res) => {
   try {
@@ -22,28 +20,28 @@ routerDeliveryImput.post("/delivery_input", async (req, res) => {
         actionResult: false,
       } as IResponseBase<string>);
     }
-    const delivery = req.body as IDeliveryInput;
+    //const delivery = req.body as IDeliveryInput;
 
-    await firebaseService
-      .INSERT(delivery)
-      .then((dt) => {
-        MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'',{
-          table:"DELIVERY_INPUT",
-          type:ResponseDeliveryEnum.INSERT, 
-          IDF:dt,         
-          data:delivery
-        });
-        res.status(200).json({
-          data: dt,
-          actionResult: true,
-        } as IResponseBase<typeof dt>);
-      })
-      .catch((err) => {
-        res.status(401).json({
-          data: err,
-          actionResult: false,
-        } as IResponseBase<typeof err>);
-      });
+    // await firebaseService
+    //   .INSERT(delivery)
+    //   .then((dt) => {
+    //     MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'',{
+    //       table:"DELIVERY_INPUT",
+    //       type:ResponseDeliveryEnum.INSERT,
+    //       IDF:dt,
+    //       data:delivery
+    //     });
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
   } catch (error) {
     console.log(error);
 
@@ -67,23 +65,23 @@ routerDeliveryImput.put("/delivery_input/:id", async (req, res) => {
       } as IResponseBase<string>);
     }
 
-    const delivery = req.body as IDeliveryInput;
-    const id = req.params["id"];
+    // const delivery = req.body as IDeliveryInput;
+    // const id = req.params["id"];
 
-    await firebaseService
-      .UPDATE(id, delivery)
-      .then((dt) => {
-        res.status(200).json({
-          data: dt,
-          actionResult: true,
-        } as IResponseBase<typeof dt>);
-      })
-      .catch((err) => {
-        res.status(401).json({
-          data: err,
-          actionResult: false,
-        } as IResponseBase<typeof err>);
-      });
+    // await firebaseService
+    //   .UPDATE(id, delivery)
+    //   .then((dt) => {
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
   } catch (error) {
     console.log(error);
 
@@ -104,20 +102,20 @@ routerDeliveryImput.delete("/delivery_input/:id", async (req, res) => {
     }
     const id = req.params["id"];
 
-    await firebaseService
-      .DELETE(id)
-      .then((dt) => {
-        res.status(200).json({
-          data: dt,
-          actionResult: true,
-        } as IResponseBase<typeof dt>);
-      })
-      .catch((err) => {
-        res.status(401).json({
-          data: err,
-          actionResult: false,
-        } as IResponseBase<typeof err>);
-      });
+    // await firebaseService
+    //   .DELETE(id)
+    //   .then((dt) => {
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
   } catch (error) {
     console.log(error);
 
@@ -138,20 +136,20 @@ routerDeliveryImput.get("/delivery_input/:id", async (req, res) => {
     }
     const id = req.params["id"];
 
-    await firebaseService
-      .GET(id)
-      .then((dt) => {
-        res.status(200).json({
-          data: dt,
-          actionResult: true,
-        } as IResponseBase<typeof dt>);
-      })
-      .catch((err) => {
-        res.status(401).json({
-          data: err,
-          actionResult: false,
-        } as IResponseBase<typeof err>);
-      });
+    // await firebaseService
+    //   .GET(id)
+    //   .then((dt) => {
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
   } catch (error) {
     console.log(error);
 
@@ -163,20 +161,20 @@ routerDeliveryImput.get("/delivery_input/:id", async (req, res) => {
 });
 routerDeliveryImput.get("/delivery_input", async (req, res) => {
   try {
-    await firebaseService
-      .GETALL()
-      .then((dt) => {
-        res.status(200).json({
-          data: dt,
-          actionResult: true,
-        } as IResponseBase<typeof dt>);
-      })
-      .catch((err) => {
-        res.status(401).json({
-          data: err,
-          actionResult: false,
-        } as IResponseBase<typeof err>);
-      });
+    // await firebaseService
+    //   .GETALL()
+    //   .then((dt) => {
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
   } catch (error) {
     console.log(error);
 

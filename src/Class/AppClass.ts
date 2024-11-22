@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import { isConnected } from "../DatabaseMySql/DataBaseMySql";
+import cors from "cors";
 dotenv.config();
 
 export class AppServer {
@@ -19,11 +20,19 @@ export class AppServer {
     this.websocket();
   }
   private config(): void {
+    this.app.use(
+      cors({
+        origin: "http://localhost:4200",
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
+      })
+    );
     this.app.use(express.json());
-    this.app.use(express.static(path.join(process.cwd(), "/public")));
-    this.app.use("/api", require("../routers/index"));
     this.app.use(cookieParser());
     this.app.use(bodyParser.json());
+    this.app.use(express.static(path.join(process.cwd(), "/public")));
+    this.app.use("/api", require("../routers/index"));
   }
 
   private websocket(): void {
@@ -44,7 +53,7 @@ export class AppServer {
       console.log(
         `\x1b[33m[SERVER]✅\x1b[36m Server na porta ${
           process.env.PORT_SERVER
-        }: http://localhost:${process.env.PORT_SERVER || 3000}/api \x1b[0m` 
+        }: http://localhost:${process.env.PORT_SERVER || 3000}/api \x1b[0m`
       );
     });
   }

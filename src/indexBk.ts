@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import { WebSocketServer } from "ws";
 import { v4 as uuidv4 } from "uuid";
 import http from "http";
-import { isConnected } from "./Firebase/FirebaseDb";
 
 dotenv.config();
 const app = express();
@@ -29,7 +28,7 @@ const server = app.listen(process.env.PORT_SERVER || 3000, () => {
 app.get("/api/connected", (req, res) => {
   res.status(200).json({
     API: true,
-    DB: isConnected,
+    DB: false,
   });
 });
 

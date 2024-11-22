@@ -6,6 +6,7 @@ export class JwtUtil {
   private static JWT_SECRET = process.env.JWT;
 
   public static GenerateToken(payload: object, expiresIn: string = "1h") {
+    
     if (!this.JWT_SECRET) {
       throw new Error("JWT_SECRET não está definido");
     }

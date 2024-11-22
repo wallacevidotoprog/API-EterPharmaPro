@@ -1,14 +1,13 @@
+import { IDelivery } from "./../Interface/db/IDelivery";
 import { IResponseBase } from "./../Interface/IResponseBase";
 import { Router } from "express";
-import { FirebaseService } from "../Class/FirebaseServiceClass";
-import { IDelivery } from "../Interface/IDelivery";
-import {MessageFirebaseNotify} from "../services/WebSocketServices"
+import { MessageFirebaseNotify } from "../services/WebSocketServices";
 import { TypesReciverWebSocketEnum } from "../Enum/TypesReciverWebSocketEnum";
 import { ResponseDeliveryEnum } from "../Enum/ResponseDeliveryEnum";
 
 const routerDelivery = Router();
 
-const firebaseService = new FirebaseService<IDelivery>("DELIVERY");
+const firebaseService = null; // new FirebaseService<IDelivery>("DELIVERY");
 
 routerDelivery.post("/delivery", async (req, res) => {
   try {
@@ -24,20 +23,20 @@ routerDelivery.post("/delivery", async (req, res) => {
     }
     const delivery = req.body as IDelivery;
 
-    await firebaseService
-      .INSERT(delivery)
-      .then((dt) => {
-        res.status(200).json({
-          data: dt,
-          actionResult: true,
-        } as IResponseBase<typeof dt>);
-      })
-      .catch((err) => {
-        res.status(401).json({
-          data: err,
-          actionResult: false,
-        } as IResponseBase<typeof err>);
-      });
+    // await firebaseService
+    //   .INSERT(delivery)
+    //   .then((dt) => {
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
   } catch (error) {
     console.log(error);
 
@@ -48,7 +47,7 @@ routerDelivery.post("/delivery", async (req, res) => {
   }
 });
 
-routerDelivery.put("/delivery/:id", async (req, res) => {  
+routerDelivery.put("/delivery/:id", async (req, res) => {
   try {
     if (
       !req.body ||
@@ -64,26 +63,26 @@ routerDelivery.put("/delivery/:id", async (req, res) => {
     const delivery = req.body as IDelivery;
     const id = req.params["id"];
 
-    await firebaseService
-      .UPDATE(id, delivery)
-      .then(async (dt) => {
-        MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'',{
-          table:"DELIVERY",
-          type:ResponseDeliveryEnum.UPDATE,
-          IDF:id,
-          data:await firebaseService.GET(id)
-        });
-        res.status(200).json({
-          data: dt,
-          actionResult: true,
-        } as IResponseBase<typeof dt>);
-      })
-      .catch((err) => {
-        res.status(401).json({
-          data: err,
-          actionResult: false,
-        } as IResponseBase<typeof err>);
-      });
+    // await firebaseService
+    //   .UPDATE(id, delivery)
+    //   .then(async (dt) => {
+    //     MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'',{
+    //       table:"DELIVERY",
+    //       type:ResponseDeliveryEnum.UPDATE,
+    //       IDF:id,
+    //       data:await firebaseService.GET(id)
+    //     });
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
   } catch (error) {
     console.log(error);
 
@@ -104,20 +103,20 @@ routerDelivery.delete("/delivery/:id", async (req, res) => {
     }
     const id = req.params["id"];
 
-    await firebaseService
-      .DELETE(id)
-      .then((dt) => {
-        res.status(200).json({
-          data: dt,
-          actionResult: true,
-        } as IResponseBase<typeof dt>);
-      })
-      .catch((err) => {
-        res.status(401).json({
-          data: err,
-          actionResult: false,
-        } as IResponseBase<typeof err>);
-      });
+    // await firebaseService
+    //   .DELETE(id)
+    //   .then((dt) => {
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
   } catch (error) {
     console.log(error);
 
@@ -138,20 +137,20 @@ routerDelivery.get("/delivery/:id", async (req, res) => {
     }
     const id = req.params["id"];
 
-    await firebaseService
-      .GET(id)
-      .then((dt) => {
-        res.status(200).json({
-          data: dt,
-          actionResult: true,
-        } as IResponseBase<typeof dt>);
-      })
-      .catch((err) => {
-        res.status(401).json({
-          data: err,
-          actionResult: false,
-        } as IResponseBase<typeof err>);
-      });
+    // await firebaseService
+    //   .GET(id)
+    //   .then((dt) => {
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
   } catch (error) {
     console.log(error);
 
@@ -163,20 +162,20 @@ routerDelivery.get("/delivery/:id", async (req, res) => {
 });
 routerDelivery.get("/delivery", async (req, res) => {
   try {
-    await firebaseService
-      .GETALL()
-      .then((dt) => {
-        res.status(200).json({
-          data: dt,
-          actionResult: true,
-        } as IResponseBase<typeof dt>);
-      })
-      .catch((err) => {
-        res.status(401).json({
-          data: err,
-          actionResult: false,
-        } as IResponseBase<typeof err>);
-      });
+    // await firebaseService
+    //   .GETALL()
+    //   .then((dt) => {
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
   } catch (error) {
     console.log(error);
 
