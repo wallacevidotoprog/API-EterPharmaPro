@@ -19,12 +19,12 @@ async function connectToDatabase() {
       waitForConnections: true,
       //connectionLimit: 10, // Número máximo de conexões no pool
       //queueLimit: 0, // Sem limite para a fila de conexões
-      //ssl: {
-      //rejectUnauthorized: false,
+      ssl: {
+      rejectUnauthorized: false,
       // ca: process.env.CA_CERT_PATH
       //   ? require("fs").readFileSync(process.env.CA_CERT_PATH)
       //   : undefined,
-      //},
+      },
     });
 
     console.log(
