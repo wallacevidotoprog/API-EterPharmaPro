@@ -15,12 +15,11 @@ routerUser.get("/verifyAuth", AuthMiddleware.Authenticate, (req, res) => {
   res.status(201).json({
     message: "Acesso permitido.",
     actionResult: true,
-    data:{
-      Authentication:true
-    }
+    data: {
+      Authentication: true,
+    },
   } as IResponseBase<IVerifyAuth>);
 });
-
 
 routerUser.post("/login", async (req, res) => {
   try {
@@ -32,7 +31,6 @@ routerUser.post("/login", async (req, res) => {
         actionResult: false,
       } as IResponseBase<null>);
     }
-
     if (!connection) {
       res.status(500).json({
         message: "Erro interno: conexão com o banco de dados não estabelecida.",
@@ -54,7 +52,7 @@ routerUser.post("/login", async (req, res) => {
 
     if (Array.isArray(verifyLogin) && verifyLogin.length > 0) {
       const userTemp: IUsers = verifyLogin[0];
-      
+
       const isPasswordValid = await AuthService.CryptPassCompare(
         objReq.pass,
         userTemp.pass
@@ -65,7 +63,7 @@ routerUser.post("/login", async (req, res) => {
           message: "Credenciais inválidas.",
           actionResult: false,
         } as IResponseBase<null>);
-        return; 
+        return;
       }
 
       res.cookie("authToken", await AuthService.GenerateToken(userTemp), {
@@ -87,17 +85,15 @@ routerUser.post("/login", async (req, res) => {
 });
 
 routerUser.post("/signup", async (req, res) => {
+  //verificar se ja existe email
   try {
     const objUser: IUsers = req.body;
-
-    console.log(objUser);
 
     if (!objUser.email || !objUser.pass) {
       res.status(400).json({ message: "Email e senha são obrigatórios." }); //arrumar para o padrao
     }
 
     objUser.pass = await AuthService.CryptPass(objUser.pass);
-    console.log("crypt pass:" + objUser.pass);
 
     const [result]: any = await connection?.query(DbQuery.INSERT(objUser));
 
@@ -118,8 +114,8 @@ routerUser.post("/signup", async (req, res) => {
   }
 });
 
-routerUser.post("/logout",AuthMiddleware.eLogout, async (req, res) => {
-   res.status(200).json({
+routerUser.post("/logout", AuthMiddleware.eLogout, async (req, res) => {
+  res.status(200).json({
     message: "Logout realizado com sucesso.",
     actionResult: true,
   } as IResponseBase<null>);

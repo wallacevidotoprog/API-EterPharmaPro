@@ -7,5 +7,6 @@ export interface IUsers extends IBaseDataBase{
   pass: string;
   name: string;
   position_id?: number | null;
+  permissions_id ?: number | null;
   stats: boolean;
 }
