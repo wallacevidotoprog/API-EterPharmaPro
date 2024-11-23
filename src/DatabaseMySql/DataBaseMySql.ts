@@ -20,7 +20,7 @@ async function connectToDatabase() {
       //connectionLimit: 10, // Número máximo de conexões no pool
       //queueLimit: 0, // Sem limite para a fila de conexões
       ssl: {
-      rejectUnauthorized: false,
+      rejectUnauthorized: true,
       // ca: process.env.CA_CERT_PATH
       //   ? require("fs").readFileSync(process.env.CA_CERT_PATH)
       //   : undefined,
@@ -60,11 +60,11 @@ function getPool(): Pool {
      // error
     );
   }
-  const [rows] = await pool.query("SELECT NOW()");
-  const serverTime = new Date((rows as any)[0]["NOW()"]);
+  //const [rows] = await pool.query("SELECT NOW()");
+  //const serverTime = new Date((rows as any)[0]["NOW()"]);
   console.log(
     "\x1b[33m[MYSQL-Command]\x1b[36mHora do servidor:",
-    serverTime.toLocaleString("pt-BR")
+   // serverTime.toLocaleString("pt-BR")
   );
 })();
 
