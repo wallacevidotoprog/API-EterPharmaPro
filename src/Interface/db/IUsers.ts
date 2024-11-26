@@ -1,5 +1,4 @@
 import { IBaseDataBase } from "./IBaseDataBase";
-
 export interface IUsers extends IBaseDataBase{
   store_id?: number | null;
   email: string;

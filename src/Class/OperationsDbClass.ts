@@ -16,6 +16,15 @@ export class OperationsDbClass<T extends object> {
   }
 
   public UPDATE(model: Partial<T>, condition: Partial<T>): string {
+
+    if (!model || Object.keys(model).length === 0) {
+      throw new Error("O objeto 'model' não pode estar vazio.");
+    }
+  
+    if (!condition || Object.keys(condition).length === 0) {
+      throw new Error("O objeto 'condition' não pode estar vazio.");
+    }
+    
     const updates = Object.entries(model)
       .map(
         ([key, value]) =>

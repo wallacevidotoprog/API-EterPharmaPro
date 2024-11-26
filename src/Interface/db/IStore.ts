@@ -1,6 +1,6 @@
 import { IBaseDataBase } from "./IBaseDataBase";
 
-export interface Store extends  IBaseDataBase {
+export interface IStore extends  IBaseDataBase {
     filial: string;
     cnpj: string;
     name: string;

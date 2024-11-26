@@ -7,9 +7,10 @@ import { OperationsDbClass } from "../Class/OperationsDbClass";
 import { connection } from "../DatabaseMySql/DataBaseMySql";
 import { ILoginUser } from "../Interface/ILoginUser";
 import { IVerifyAuth } from "../Interface/IVerifyAuth";
+import { DbModel } from "../models/DbModel";
 
 const routerUser = Router();
-const DbQuery = new OperationsDbClass<IUsers>("users");
+const dbQ = new DbModel<IUsers>(new OperationsDbClass<IUsers>("users"));
 
 routerUser.get("/verifyAuth", AuthMiddleware.Authenticate, (req, res) => {
   res.status(201).json({
@@ -21,11 +22,20 @@ routerUser.get("/verifyAuth", AuthMiddleware.Authenticate, (req, res) => {
   } as IResponseBase<IVerifyAuth>);
 });
 
-routerUser.post("/login", async (req, res) => {
-  try {
-    const objReq: ILoginUser = req.body;
+routerUser.get("/teste", AuthMiddleware.Authenticate,async (req, res) => {
+  const retult:IUsers[]|any = await dbQ.GET({id:2 });
 
-    if (!objReq.email || !objReq.pass) {
+  console.log(retult);
+  
+  res.status(200).json({
+    message: "tudo OK.",
+    actionResult: true,
+    data:retult
+  } as IResponseBase<IUsers[]>);
+});
+routerUser.post("/login", async (req, res) => {//verificar se nao for passado o email e pass
+  try {
+    if (!req.body?.email || !req.body?.pass) {
       res.status(400).json({
         message: "Login ou Senha não preenchidos.",
         actionResult: false,
@@ -37,13 +47,19 @@ routerUser.post("/login", async (req, res) => {
         actionResult: false,
       } as IResponseBase<null>);
     }
+    const objReq: ILoginUser = req.body;
+    const [rows, _]: any = await dbQ.GET({ email: objReq.email })
+    //connection?.query("dasda"
+      //DbQuery.GET({ email: objReq.email })
+   //);
 
-    const [rows, _]: any = await connection?.query(
-      DbQuery.GET({ email: objReq.email })
-    );
+   
+   
     const verifyLogin: IUsers[] = rows;
+    console.log(verifyLogin.length);
 
-    if (!Array.isArray(verifyLogin) || verifyLogin.length === 0) {
+    //if (!Array.isArray(verifyLogin) || verifyLogin.length === 0) {
+    if (verifyLogin.length === 0) {
       res.status(401).json({
         message: "Credenciais inválidas.",
         actionResult: false,
@@ -95,7 +111,8 @@ routerUser.post("/signup", async (req, res) => {
 
     objUser.pass = await AuthService.CryptPass(objUser.pass);
 
-    const [result]: any = await connection?.query(DbQuery.INSERT(objUser));
+    //const [result]: any = await connection?.query(DbQuery.INSERT(objUser));
+    const [result]: any = await dbQ.INSERT(objUser);
 
     if (result && result.insertId) {
       console.log("ID inserido:", result.insertId);
@@ -108,6 +125,7 @@ routerUser.post("/signup", async (req, res) => {
       actionResult: true,
     } as IResponseBase<null>);
   } catch (error) {
+    console.warn(error);
     res
       .status(500)
       .json({ message: error, actionResult: false } as IResponseBase<null>);
@@ -125,10 +143,8 @@ routerUser.get("/protected", AuthMiddleware.Authenticate, (req, res) => {
   res.json({ message: "Acesso permitido.", user: req.body.user });
 });
 
-routerUser.post("/users", async (req, res) => {
+routerUser.post("/users",AuthMiddleware.Authenticate, async (req, res) => {
   try {
-    console.log(req.body);
-
     if (
       !req.body ||
       typeof req.body !== "object" ||
@@ -139,22 +155,14 @@ routerUser.post("/users", async (req, res) => {
         actionResult: false,
       } as IResponseBase<string>);
     }
-    const delivery = req.body as IUsers;
+    const objUser: IUsers = req.body;
 
-    // await firebaseService
-    //   .INSERT(delivery)
-    //   .then((dt) => {
-    //     res.status(200).json({
-    //       data: dt,
-    //       actionResult: true,
-    //     } as IResponseBase<typeof dt>);
-    //   })
-    //   .catch((err) => {
-    //     res.status(401).json({
-    //       data: err,
-    //       actionResult: false,
-    //     } as IResponseBase<typeof err>);
-    //   });
+    dbQ.INSERT(objUser).then((ret) => {
+      res.status(200).json({
+        message: "Usuário inserido com sucesso.",
+        actionResult: true,
+      } as IResponseBase<typeof undefined>);
+    });
   } catch (error) {
     console.log(error);
 
@@ -165,7 +173,7 @@ routerUser.post("/users", async (req, res) => {
   }
 });
 
-routerUser.put("/users/:id", async (req, res) => {
+routerUser.put("/users/:id",AuthMiddleware.Authenticate, async (req, res) => {
   try {
     if (
       !req.body ||
@@ -178,23 +186,22 @@ routerUser.put("/users/:id", async (req, res) => {
       } as IResponseBase<string>);
     }
 
-    const delivery = req.body as IUsers;
-    const id = req.params["id"];
+    const users = req.body as IUsers;
 
-    // await firebaseService
-    //   .UPDATE(id, delivery)
-    //   .then((dt) => {
-    //     res.status(200).json({
-    //       data: dt,
-    //       actionResult: true,
-    //     } as IResponseBase<typeof dt>);
-    //   })
-    //   .catch((err) => {
-    //     res.status(401).json({
-    //       data: err,
-    //       actionResult: false,
-    //     } as IResponseBase<typeof err>);
-    //   });
+    if (users.pass) {
+      console.log(users.pass);
+      
+      users.pass = await AuthService.CryptPass(users.pass);
+    }
+
+    const id: number = parseInt(req.params["id"]);
+
+    dbQ.UPDATE(users, { id: id }).then((ret) => {
+      res.status(200).json({
+        message: "Usuário atualizado com sucesso.",
+        actionResult: true,
+      } as IResponseBase<typeof undefined>);
+    });
   } catch (error) {
     console.log(error);
 
@@ -205,7 +212,7 @@ routerUser.put("/users/:id", async (req, res) => {
   }
 });
 
-routerUser.delete("/users/:id", async (req, res) => {
+routerUser.delete("/users/:id",AuthMiddleware.Authenticate, async (req, res) => {
   try {
     if (!req.params["id"] || Object.keys(req.params["id"]).length === 0) {
       res.status(400).json({
@@ -239,7 +246,7 @@ routerUser.delete("/users/:id", async (req, res) => {
   }
 });
 
-routerUser.get("/users/:id", async (req, res) => {
+routerUser.get("/users/:id",AuthMiddleware.Authenticate, async (req, res) => {
   try {
     if (!req.params["id"] || Object.keys(req.params["id"]).length === 0) {
       res.status(400).json({
@@ -272,7 +279,7 @@ routerUser.get("/users/:id", async (req, res) => {
     } as IResponseBase<typeof undefined>);
   }
 });
-routerUser.get("/users", async (req, res) => {
+routerUser.get("/users",AuthMiddleware.Authenticate, async (req, res) => {
   try {
     // await firebaseService
     //   .GETALL()
