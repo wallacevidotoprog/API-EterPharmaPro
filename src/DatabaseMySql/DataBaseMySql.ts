@@ -1,7 +1,5 @@
-import { Query } from "./../../node_modules/mysql2/typings/mysql/index.d";
 import mysql, { Pool } from "mysql2/promise";
 import dotenv from "dotenv";
-import { Connection } from "mysql2/promise";
 
 dotenv.config();
 
@@ -20,22 +18,15 @@ async function connectToDatabase() {
       //connectionLimit: 10, // Número máximo de conexões no pool
       //queueLimit: 0, // Sem limite para a fila de conexões
       ///ssl: {
-     ///   ca:process.env.DB_CA_CERT,
+      ///   ca:process.env.DB_CA_CERT,
       // ca: process.env.CA_CERT_PATH
       //   ? require("fs").readFileSync(process.env.CA_CERT_PATH)
       //   : undefined,
-     /// },
+      /// },
     });
-
-    console.log(
-      "\x1b[33m[MYSQL]\x1b[36m✅ Conexão com o MySQL conexões criado com sucesso."
-    );
   } catch (error) {
     isConnected = false;
-    console.error(
-      "\x1b[33m[MYSQL]\x1b[36m❌ Erro ao conectar ao MySQL Database:",
-      error
-    );
+    console.error("\x1b[33m[MYSQL]\x1b[36m❌ Erro ao criar createPool:", error);
   }
 }
 function getPool(): Pool {
@@ -47,25 +38,37 @@ function getPool(): Pool {
   return connection;
 }
 (async () => {
-  await connectToDatabase();
-  const pool = getPool();
-  try {
-    if (connection != null) {
-      isConnected=true;
-      await pool.query("SET time_zone = 'America/Sao_Paulo'");
-    }
-  } catch (error) {
-    console.error(
-      "\x1b[33m[MYSQL-Command]\x1b[36m❌ Erro ao SET time_zone ao MySQL Database:",
-     // error
-    );
-  }
-  const [rows] = await pool.query("SELECT NOW()");
-  const serverTime = new Date((rows as any)[0]["NOW()"]);
-  console.log(
-    "\x1b[33m[MYSQL-Command]\x1b[36mHora do servidor:",
-    serverTime.toLocaleString("pt-BR")
-  );
+  await connectToDatabase()
+    .then(async (data) => {
+      isConnected = true;
+      console.log(
+        "\x1b[33m[MYSQL]\x1b[36m✅ Conexão com o MySQL conexões criado com sucesso."
+      );
+      const pool = getPool();
+      await pool
+        .query("SET time_zone = 'America/Sao_Paulo'")
+        .then((data) => {console.log(data);
+        })
+        .catch((error) => {
+          console.error(
+            "\x1b[33m[MYSQL-Command]\x1b[36m❌ Erro ao SET time_zone ao MySQL Database:",
+            error.sqlMessage
+          );
+        });
+      const [rows] = await pool.query("SELECT NOW()");
+      const serverTime = new Date((rows as any)[0]["NOW()"]);
+      console.log(
+        "\x1b[33m[MYSQL-Command]\x1b[36mHora do servidor:",
+        serverTime.toLocaleString("pt-BR")
+      );
+    })
+    .catch((error) => {
+      isConnected = false;
+      console.error(
+        "\x1b[33m[MYSQL]\x1b[36m❌ Erro ao conectar ao MySQL Database:",
+        error
+      );
+    });
 })();
 
 process.on("SIGINT", async () => {

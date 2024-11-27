@@ -22,7 +22,7 @@ export class AppServer {
   private config(): void {
     this.app.use(
       cors({
-        origin: "http://localhost:4200",
+        origin: process.env.ORIGIN,
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
@@ -53,7 +53,7 @@ export class AppServer {
       console.log(
         `\x1b[33m[SERVER]✅\x1b[36m Server na porta ${
           process.env.PORT_SERVER
-        }: http://localhost:${process.env.PORT_SERVER || 3000}/api \x1b[0m`
+        }: ${process.env.SERVER}:${process.env.PORT_SERVER || 3000}/api \x1b[0m`
       );
     });
   }

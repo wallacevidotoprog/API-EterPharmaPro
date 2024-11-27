@@ -4,12 +4,13 @@ import { connection } from "../DatabaseMySql/DataBaseMySql";
 import { OperationsDbClass } from "../Class/OperationsDbClass";
 import { IUsers } from "../Interface/db/IUsers";
 import { IResponseBase } from "../Interface/IResponseBase";
+import { HttpStatus } from "../Enum/HttpStatus";
 
 export class AuthMiddleware {
   public static  Authenticate(req: Request, res: Response, next: NextFunction): any {
     const token = req.cookies?.authToken;
     if (!token) {
-      return res.status(401).json({
+      return res.status(HttpStatus.UNAUTHORIZED).json({
         message: "Não autenticado.",
         actionResult: false,
       } as IResponseBase<null>);
@@ -20,7 +21,7 @@ export class AuthMiddleware {
       req.body.auth = decoded;
       next();
     } catch (error) {
-      return res.status(403).json({
+      return res.status(HttpStatus.FORBIDDEN).json({
         message: "Token inválido ou expirado.",
         actionResult: false,
       } as IResponseBase<null>);
@@ -34,7 +35,7 @@ export class AuthMiddleware {
       });
       next();
     } catch (error) {
-      res.status(403).json({ message: "Token inválido ou expirado." });
+      res.status(HttpStatus.FORBIDDEN).json({ message: "Token inválido ou expirado." });
     }
   }
 

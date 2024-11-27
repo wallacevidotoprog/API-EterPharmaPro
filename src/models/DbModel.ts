@@ -1,7 +1,5 @@
 import { OperationsDbClass } from "../Class/OperationsDbClass";
-import { TableMapper } from "../Class/TableMapperClass";
 import { connection } from "../DatabaseMySql/DataBaseMySql";
-import { IBaseDataBase } from "../Interface/db/IBaseDataBase";
 
 export class DbModel<T extends object> {
   private DbQuery: OperationsDbClass<T>;
@@ -24,9 +22,9 @@ export class DbModel<T extends object> {
       return false;
     }
   }
-  public async DELETE(model: T) {
+  public async DELETE(condition: Partial<T>) {
     try {
-      await connection?.query(this.DbQuery.DELETE(model));
+      await connection?.query(this.DbQuery.DELETE(condition));
     } catch (error) {
       console.warn(error);
     }
@@ -44,7 +42,8 @@ export class DbModel<T extends object> {
   }
   public async GETALL() {
     try {
-      await connection?.query(this.DbQuery.GETALL());
+      const [rows, _]: any = await connection?.query(this.DbQuery.GETALL());
+      return rows;
     } catch (error) {
       console.warn(error);
     }
