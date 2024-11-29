@@ -45,16 +45,16 @@ function getPool(): Pool {
         "\x1b[33m[MYSQL]\x1b[36m✅ Conexão com o MySQL conexões criado com sucesso."
       );
       const pool = getPool();
-      await pool
-        .query("SET time_zone = 'America/Sao_Paulo'")
-        .then((data) => {console.log(data);
-        })
-        .catch((error) => {
-          console.error(
-            "\x1b[33m[MYSQL-Command]\x1b[36m❌ Erro ao SET time_zone ao MySQL Database:",
-            error.sqlMessage
-          );
-        });
+      // await pool
+      //   .query("SET time_zone = 'America/Sao_Paulo'")
+      //   .then((data) => {console.log(data);
+      //   })
+      //   .catch((error) => {
+      //     console.error(
+      //       "\x1b[33m[MYSQL-Command]\x1b[36m❌ Erro ao SET time_zone ao MySQL Database:",
+      //       error.sqlMessage
+      //     );
+      //   });
       const [rows] = await pool.query("SELECT NOW()");
       const serverTime = new Date((rows as any)[0]["NOW()"]);
       console.log(

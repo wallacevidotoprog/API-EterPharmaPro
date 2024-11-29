@@ -1,6 +1,6 @@
+import { Router } from "express";
 import { IUsers } from "./../Interface/db/IUsers";
 import { IResponseBase } from "./../Interface/IResponseBase";
-import { Router } from "express";
 import { AuthMiddleware } from "../middlewares/AuthMiddleware";
 import { AuthService } from "../services/AuthService";
 import { OperationsDbClass } from "../Class/OperationsDbClass";
@@ -10,7 +10,7 @@ import { DbModel } from "../models/DbModel";
 import { HttpStatus } from "../Enum/HttpStatus";
 
 const routerUser = Router();
-const dbQ = new DbModel<IUsers>(new OperationsDbClass<IUsers>("users"));
+const dbQueryModel = new DbModel<IUsers>(new OperationsDbClass<IUsers>("users"));
 
 routerUser.get("/verifyAuth", AuthMiddleware.Authenticate, (req, res) => {
   res.status(HttpStatus.OK).json({
@@ -23,7 +23,7 @@ routerUser.get("/verifyAuth", AuthMiddleware.Authenticate, (req, res) => {
 });
 
 routerUser.get("/teste", AuthMiddleware.Authenticate, async (req, res) => {
-  const [retult, _]: IUsers[] | any = await dbQ.GETALL();
+  const [retult, _]: IUsers[] | any = await dbQueryModel.GETALL();
 
   console.log(retult);
 
@@ -44,7 +44,7 @@ routerUser.post("/login", async (req, res) => {
     }
 
     const objReq: ILoginUser = req.body;
-    const [rows, _]: any = await dbQ.GET({ email: objReq.email });
+    const [rows, _]: any = await dbQueryModel.GET({ email: objReq.email });
 
     if (!rows && rows.length < 0) {
       res.status(401).json({
@@ -99,7 +99,7 @@ routerUser.post("/signup", async (req, res) => {
 
     objUser.pass = await AuthService.CryptPass(objUser.pass);
 
-    const [result]: any = await dbQ.INSERT(objUser);
+    const [result]: any = await dbQueryModel.INSERT(objUser);
 
     if (result && result.insertId) {
       console.log("ID inserido:", result.insertId);
@@ -126,10 +126,6 @@ routerUser.post("/logout", AuthMiddleware.eLogout, async (req, res) => {
   } as IResponseBase<null>);
 });
 
-routerUser.get("/protected", AuthMiddleware.Authenticate, (req, res) => {
-  res.json({ message: "Acesso permitido.", user: req.body.user });
-});
-
 routerUser.post("/users", AuthMiddleware.Authenticate, async (req, res) => {
   try {
     if (
@@ -145,7 +141,7 @@ routerUser.post("/users", AuthMiddleware.Authenticate, async (req, res) => {
     }
     const objUser: IUsers = req.body;
 
-    dbQ.INSERT(objUser).then((ret) => {
+    await dbQueryModel.INSERT(objUser).then((ret) => {
       res.status(HttpStatus.CREATED).json({
         message: "Usuário inserido com sucesso.",
         actionResult: true,
@@ -169,7 +165,7 @@ routerUser.put("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
       Object.keys(req.body).length === 0
     ) {
       res.status(HttpStatus.BAD_REQUEST).json({
-        data: "Corpo da requisição inválido",
+        message: "Corpo da requisição inválido",
         actionResult: false,
       } as IResponseBase<string>);
       return;
@@ -185,7 +181,7 @@ routerUser.put("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
 
     const id: number = parseInt(req.params["id"]);
 
-    dbQ.UPDATE(users, { id: id }).then((ret) => {
+    dbQueryModel.UPDATE(users, { id: id }).then((ret) => {
       res.status(HttpStatus.OK).json({
         message: "Usuário atualizado com sucesso.",
         actionResult: true,
@@ -199,10 +195,7 @@ routerUser.put("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
   }
 });
 
-routerUser.delete(
-  "/users/:id",
-  AuthMiddleware.Authenticate,
-  async (req, res) => {
+routerUser.delete("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
     try {
       if (!req.params["id"] || Object.keys(req.params["id"]).length === 0) {
         res.status(HttpStatus.BAD_REQUEST).json({
@@ -213,7 +206,7 @@ routerUser.delete(
       }
       const id: number = parseInt(req.params["id"]);
 
-      await dbQ
+      await dbQueryModel
         .DELETE({ id: id })
         .then(() => {
           res.status(HttpStatus.OK).json({
@@ -242,14 +235,14 @@ routerUser.get("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
   try {
     if (!req.params["id"] || Object.keys(req.params["id"]).length === 0) {
       res.status(HttpStatus.BAD_REQUEST).json({
-        data: "O params da requisição inválido",
+        message: "O params da requisição inválido",
         actionResult: false,
       } as IResponseBase<string>);
       return;
     }
     const id: number = parseInt(req.params["id"]);
 
-    await dbQ
+    await dbQueryModel
       .GET({ id: id })
       .then((data: IUsers) => {
         res.status(HttpStatus.OK).json({
@@ -267,14 +260,14 @@ routerUser.get("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
     console.log(error);
 
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      data: undefined,
+      data: error,
       actionResult: false,
-    } as IResponseBase<typeof undefined>);
+    } as IResponseBase<typeof error>);
   }
 });
 routerUser.get("/users", AuthMiddleware.Authenticate, async (req, res) => {
   try {
-    await dbQ
+    await dbQueryModel
       .GETALL()
       .then((data) => {
         res.status(HttpStatus.OK).json({
@@ -289,10 +282,10 @@ routerUser.get("/users", AuthMiddleware.Authenticate, async (req, res) => {
         } as IResponseBase<typeof error>);
       });
   } catch (error) {
-    res.status(500).json({
-      data: undefined,
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      data: error,
       actionResult: false,
-    } as IResponseBase<typeof undefined>);
+    } as IResponseBase<typeof error>);
   }
 });
 

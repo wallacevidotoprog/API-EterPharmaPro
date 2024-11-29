@@ -1,14 +1,15 @@
-import { IResponseBase } from "../Interface/IResponseBase";
+import { IDelivery } from "./../Interface/db/IDelivery";
+import { IResponseBase } from "./../Interface/IResponseBase";
 import { Router } from "express";
 import { MessageFirebaseNotify } from "../services/WebSocketServices";
 import { TypesReciverWebSocketEnum } from "../Enum/TypesReciverWebSocketEnum";
 import { ResponseDeliveryEnum } from "../Enum/ResponseDeliveryEnum";
 
-const routerDeliveryImput = Router();
+const routerDelivery = Router();
 
-//const firebaseService = new FirebaseService<IDeliveryInput>("DELIVERY_INPUT");
+const firebaseService = null; // new FirebaseService<IDelivery>("DELIVERY");
 
-routerDeliveryImput.post("/delivery_input", async (req, res) => {
+routerDelivery.post("/delivery", async (req, res) => {
   try {
     if (
       !req.body ||
@@ -20,16 +21,56 @@ routerDeliveryImput.post("/delivery_input", async (req, res) => {
         actionResult: false,
       } as IResponseBase<string>);
     }
-    //const delivery = req.body as IDeliveryInput;
+    const delivery = req.body as IDelivery;
 
     // await firebaseService
     //   .INSERT(delivery)
     //   .then((dt) => {
+    //     res.status(200).json({
+    //       data: dt,
+    //       actionResult: true,
+    //     } as IResponseBase<typeof dt>);
+    //   })
+    //   .catch((err) => {
+    //     res.status(401).json({
+    //       data: err,
+    //       actionResult: false,
+    //     } as IResponseBase<typeof err>);
+    //   });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      data: undefined,
+      actionResult: false,
+    } as IResponseBase<typeof undefined>);
+  }
+});
+
+routerDelivery.put("/delivery/:id", async (req, res) => {
+  try {
+    if (
+      !req.body ||
+      typeof req.body !== "object" ||
+      Object.keys(req.body).length === 0
+    ) {
+      res.status(400).json({
+        data: "Corpo da requisição inválido",
+        actionResult: false,
+      } as IResponseBase<string>);
+    }
+
+    const delivery = req.body as IDelivery;
+    const id = req.params["id"];
+
+    // await firebaseService
+    //   .UPDATE(id, delivery)
+    //   .then(async (dt) => {
     //     MessageFirebaseNotify(TypesReciverWebSocketEnum.Delivery,'',{
-    //       table:"DELIVERY_INPUT",
-    //       type:ResponseDeliveryEnum.INSERT,
-    //       IDF:dt,
-    //       data:delivery
+    //       table:"DELIVERY",
+    //       type:ResponseDeliveryEnum.UPDATE,
+    //       IDF:id,
+    //       data:await firebaseService.GET(id)
     //     });
     //     res.status(200).json({
     //       data: dt,
@@ -52,47 +93,7 @@ routerDeliveryImput.post("/delivery_input", async (req, res) => {
   }
 });
 
-routerDeliveryImput.put("/delivery_input/:id", async (req, res) => {
-  try {
-    if (
-      !req.body ||
-      typeof req.body !== "object" ||
-      Object.keys(req.body).length === 0
-    ) {
-      res.status(400).json({
-        data: "Corpo da requisição inválido",
-        actionResult: false,
-      } as IResponseBase<string>);
-    }
-
-    // const delivery = req.body as IDeliveryInput;
-    // const id = req.params["id"];
-
-    // await firebaseService
-    //   .UPDATE(id, delivery)
-    //   .then((dt) => {
-    //     res.status(200).json({
-    //       data: dt,
-    //       actionResult: true,
-    //     } as IResponseBase<typeof dt>);
-    //   })
-    //   .catch((err) => {
-    //     res.status(401).json({
-    //       data: err,
-    //       actionResult: false,
-    //     } as IResponseBase<typeof err>);
-    //   });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      data: undefined,
-      actionResult: false,
-    } as IResponseBase<typeof undefined>);
-  }
-});
-
-routerDeliveryImput.delete("/delivery_input/:id", async (req, res) => {
+routerDelivery.delete("/delivery/:id", async (req, res) => {
   try {
     if (!req.params["id"] || Object.keys(req.params["id"]).length === 0) {
       res.status(400).json({
@@ -126,7 +127,7 @@ routerDeliveryImput.delete("/delivery_input/:id", async (req, res) => {
   }
 });
 
-routerDeliveryImput.get("/delivery_input/:id", async (req, res) => {
+routerDelivery.get("/delivery/:id", async (req, res) => {
   try {
     if (!req.params["id"] || Object.keys(req.params["id"]).length === 0) {
       res.status(400).json({
@@ -159,7 +160,7 @@ routerDeliveryImput.get("/delivery_input/:id", async (req, res) => {
     } as IResponseBase<typeof undefined>);
   }
 });
-routerDeliveryImput.get("/delivery_input", async (req, res) => {
+routerDelivery.get("/delivery", async (req, res) => {
   try {
     // await firebaseService
     //   .GETALL()
@@ -185,4 +186,4 @@ routerDeliveryImput.get("/delivery_input", async (req, res) => {
   }
 });
 
-export default routerDeliveryImput;
+export default routerDelivery;
