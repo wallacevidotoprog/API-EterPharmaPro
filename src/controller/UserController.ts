@@ -10,7 +10,9 @@ import { DbModel } from "../models/DbModel";
 import { HttpStatus } from "../Enum/HttpStatus";
 
 const routerUser = Router();
-const dbQueryModel = new DbModel<IUsers>(new OperationsDbClass<IUsers>("users"));
+const dbQueryModel = new DbModel<IUsers>(
+  new OperationsDbClass<IUsers>("users")
+);
 
 routerUser.get("/verifyAuth", AuthMiddleware.Authenticate, (req, res) => {
   res.status(HttpStatus.OK).json({
@@ -98,7 +100,7 @@ routerUser.post("/signup", async (req, res) => {
     }
 
     objUser.pass = await AuthService.CryptPass(objUser.pass);
-
+    objUser.position_id = 1;
     const [result]: any = await dbQueryModel.INSERT(objUser);
 
     if (result && result.insertId) {
@@ -195,7 +197,10 @@ routerUser.put("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
   }
 });
 
-routerUser.delete("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
+routerUser.delete(
+  "/users/:id",
+  AuthMiddleware.Authenticate,
+  async (req, res) => {
     try {
       if (!req.params["id"] || Object.keys(req.params["id"]).length === 0) {
         res.status(HttpStatus.BAD_REQUEST).json({

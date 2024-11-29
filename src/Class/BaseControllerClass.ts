@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../Enum/HttpStatus";
 import { IResponseBase } from "../Interface/IResponseBase";
+import CustomLogger from "../logger/CustomLogger";
 
 export abstract class BaseControllerClass<T> {
   protected abstract dbModel: any;
@@ -20,7 +21,6 @@ export abstract class BaseControllerClass<T> {
       return true;
     } catch (error) {
       console.log(error);
-      //CustomLogger.error(error);
       return false;
     }
   }
@@ -47,13 +47,10 @@ export abstract class BaseControllerClass<T> {
   }
 
   public async CREATE(req: Request, res: Response): Promise<void> {
-
     if (!this.VallidateBody(req, res)) return;
 
-    console.log(req.body);
     try {
-      const entity: T | any = req.body;
-
+      const entity: T = req.body as T;
       const result = await this.dbModel.INSERT(entity);
       res.status(HttpStatus.CREATED).json({
         actionResult: true,
@@ -70,9 +67,9 @@ export abstract class BaseControllerClass<T> {
   public async UPDATE(req: Request, res: Response): Promise<void> {
     const id = this.ValidateParams(req, res, "id");
     if (!id || !this.VallidateBody(req, res)) return;
-
     try {
-      const entity: T = req.body;
+      const entity: T = req.body as T;
+
       const result = await this.dbModel.UPDATE(entity, { id });
       res.status(HttpStatus.OK).json({
         actionResult: true,

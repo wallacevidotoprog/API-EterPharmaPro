@@ -5,6 +5,5 @@ export interface IDelivery extends IBaseDataBase {
   user_id?: number | null;
   date: Date;
   motor_kilometers: number;
-  stats: number;
   date_completed: Date;
 }

@@ -18,7 +18,7 @@ export class AuthMiddleware {
 
     try {
       const decoded = JwtUtil.VerifyToken(token);
-      req.body.auth = decoded;
+      req.auth = decoded;
       next();
     } catch (error) {
       return res.status(HttpStatus.FORBIDDEN).json({

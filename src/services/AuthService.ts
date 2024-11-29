@@ -23,9 +23,7 @@ export class AuthService {
         email: obj.email,
         name: obj.name,
         permissions: await this.SetPermissions(obj.id) || [], //#Implementar
-      };
-      console.log(jwtNew);
-      
+      };      
       return JwtUtil.GenerateToken({ jwtNew });
     } catch (error) {
       throw new Error("Erro ao gerar token JWT.");
