@@ -28,6 +28,7 @@ export class AuthMiddleware {
     }
   }
   public static eLogout(req: Request, res: Response, next: NextFunction): void {
+  
     try {
       res.clearCookie("authToken", {
         httpOnly: true,

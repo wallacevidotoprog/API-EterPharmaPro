@@ -122,6 +122,7 @@ routerUser.post("/signup", async (req, res) => {
 });
 
 routerUser.post("/logout", AuthMiddleware.eLogout, async (req, res) => {
+  
   res.status(HttpStatus.OK).json({
     message: "Logout realizado com sucesso.",
     actionResult: true,
