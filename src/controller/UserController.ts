@@ -1,3 +1,4 @@
+import { IUsersResp } from './../Interface/IUsersResp';
 import { Router } from "express";
 import { IUsers } from "./../Interface/db/IUsers";
 import { IResponseBase } from "./../Interface/IResponseBase";
@@ -8,6 +9,7 @@ import { ILoginUser } from "../Interface/ILoginUser";
 import { IVerifyAuth } from "../Interface/IVerifyAuth";
 import { DbModel } from "../models/DbModel";
 import { HttpStatus } from "../Enum/HttpStatus";
+import { omitFields } from '../utils/globais';
 
 const routerUser = Router();
 const dbQueryModel = new DbModel<IUsers>(
@@ -271,13 +273,17 @@ routerUser.get("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
     } as IResponseBase<typeof error>);
   }
 });
+
 routerUser.get("/users", AuthMiddleware.Authenticate, async (req, res) => {
   try {
     await dbQueryModel
       .GETALL()
-      .then((data) => {
+      .then(async (data) => {
+
+        const tempUser= data.map((user: any) => omitFields(user, ["pass"]));
+        
         res.status(HttpStatus.OK).json({
-          data: data,
+          data: tempUser,
           actionResult: true,
         } as IResponseBase<typeof data>);
       })
