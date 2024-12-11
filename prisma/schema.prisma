@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model address {
+  id           Int      @id @default(autoincrement())
+  cep          String?  @db.VarChar(45)
+  place        String   @db.VarChar(45)
+  number       String   @db.VarChar(45)
+  neighborhood String   @db.VarChar(45)
+  city         String   @db.VarChar(45)
+  uf           String   @db.VarChar(2)
+  createAt     DateTime @default(now()) @db.DateTime(0)
+  updateAt     DateTime @default(now()) @db.DateTime(0)
+}
+
+model client {
+  id       Int      @id @default(autoincrement())
+  cpf      String?  @db.VarChar(45)
+  rg       String?  @db.VarChar(45)
+  name     String   @db.VarChar(45)
+  phone    String   @db.VarChar(45)
+  createAt DateTime @default(now()) @db.DateTime(0)
+  updateAt DateTime @default(now()) @db.DateTime(0)
+}
+
+model client_address {
+  id         Int      @id @default(autoincrement())
+  client_id  Int?
+  address_id Int?
+  createAt   DateTime @default(now()) @db.DateTime(0)
+  updateAt   DateTime @default(now()) @db.DateTime(0)
+
+  @@index([address_id], map: "client_address_addrees_fk_idx")
+  @@index([client_id], map: "client_address_client_fk_idx")
+}
+
+model delivery {
+  id                Int       @id @default(autoincrement())
+  order_delivery_id Int?
+  user_id           Int?
+  date              DateTime  @db.DateTime(0)
+  motor_kilometers  Int
+  date_completed    DateTime? @db.DateTime(0)
+  createAt          DateTime  @default(now()) @db.DateTime(0)
+  updateAt          DateTime  @default(now()) @db.DateTime(0)
+
+  @@index([order_delivery_id], map: "delivery_order_delivery_id_fk_idx")
+  @@index([user_id], map: "delivery_userid_fk,_idx")
+}
+
+model delivery_status {
+  id          Int      @id @default(autoincrement())
+  delivery_id Int?
+  status_id   Int?
+  createAt    DateTime @db.DateTime(0)
+  updateAt    DateTime @db.DateTime(0)
+
+  @@index([delivery_id], map: "delivery_status_delivery_fk_idx")
+  @@index([status_id], map: "delivery_status_status_id_fk_idx")
+}
+
+model maintenance_motor {
+  id                  Int      @id @default(autoincrement())
+  type_maintenance_id Int?
+  motorcycle_id       Int?
+  date                DateTime @db.DateTime(0)
+  value               Decimal  @db.Decimal(10, 2)
+  location            String?  @db.VarChar(45)
+  photo_receipt       String?  @db.VarChar(45)
+  createAt            DateTime @default(now()) @db.DateTime(0)
+  updateAt            DateTime @default(now()) @db.DateTime(0)
+
+  @@index([motorcycle_id], map: "maintenance_motor_motorcycle_fk_idx")
+  @@index([type_maintenance_id], map: "maintenance_motor_type_maintenance_fk_idx")
+}
+
+model motorcycle {
+  id       Int      @id @default(autoincrement())
+  store_id Int?
+  model    String   @db.VarChar(45)
+  year     Int
+  createAt DateTime @default(now()) @db.DateTime(0)
+  updateAt DateTime @default(now()) @db.DateTime(0)
+
+  @@index([store_id], map: "motorcycle_store_id_fk_idx")
+}
+
+model order_delivery {
+  id            Int      @id @default(autoincrement())
+  user_id       Int?
+  date          DateTime @db.DateTime(0)
+  client_id     Int?
+  address_id    Int?
+  type_order_id Int?
+  value         Decimal  @db.Decimal(10, 2)
+  createAt      DateTime @default(now()) @db.DateTime(0)
+  updateAt      DateTime @default(now()) @db.DateTime(0)
+
+  @@index([address_id], map: "order_delivery_address_fk_idx")
+  @@index([client_id], map: "order_delivery_client_fk_idx")
+  @@index([type_order_id], map: "order_delivery_type_order_fk_idx")
+  @@index([user_id], map: "order_delivery_user_fk_idx")
+}
+
+model permissions {
+  id       Int      @id @default(autoincrement())
+  name     String   @db.VarChar(45)
+  createAt DateTime @default(now()) @db.DateTime(0)
+  updateAt DateTime @default(now()) @db.DateTime(0)
+}
+
+model position {
+  id       Int      @id @default(autoincrement())
+  name     String   @db.VarChar(45)
+  createAt DateTime @default(now()) @db.DateTime(0)
+  updateAt DateTime @default(now()) @db.DateTime(0)
+}
+
+model position_permissions {
+  id             Int      @id @default(autoincrement())
+  user_id        Int?
+  permissions_id Int?
+  createAt       DateTime @default(now()) @db.DateTime(0)
+  updateAt       DateTime @default(now()) @db.DateTime(0)
+
+  @@index([permissions_id], map: "position_permissions_permissions_id_fk_idx")
+  @@index([user_id], map: "position_permissions_user_id_fk_idx")
+}
+
+model status {
+  id       Int      @id @default(autoincrement())
+  name     String   @db.VarChar(50)
+  createAt DateTime @db.DateTime(0)
+  updateAt DateTime @db.DateTime(0)
+}
+
+model store {
+  id         Int      @id @default(autoincrement())
+  filial     String   @db.VarChar(10)
+  cnpj       String   @db.VarChar(20)
+  name       String   @db.VarChar(100)
+  address_id Int?
+  phone      String   @db.VarChar(45)
+  email      String   @db.VarChar(45)
+  createAt   DateTime @default(now()) @db.DateTime(0)
+  updateAt   DateTime @default(now()) @db.DateTime(0)
+
+  @@index([address_id], map: "store_address_fk_idx")
+}
+
+model type_maintenance {
+  id       Int      @id @default(autoincrement())
+  name     String   @db.VarChar(45)
+  createAt DateTime @default(now()) @db.DateTime(0)
+  updateAt DateTime @default(now()) @db.DateTime(0)
+}
+
+model type_order {
+  id       Int      @id @default(autoincrement())
+  name     String   @db.VarChar(45)
+  createAt DateTime @default(now()) @db.DateTime(0)
+  updateAt DateTime @default(now()) @db.DateTime(0)
+}
+
+model users {
+  id          Int      @id @default(autoincrement())
+  store_id    Int?
+  email       String   @unique(map: "email_UNIQUE") @db.VarChar(45)
+  phone       String   @db.VarChar(45)
+  pass        String   @db.VarChar(60)
+  name        String   @db.VarChar(45)
+  position_id Int?
+  stats       Int      @db.TinyInt
+  createAt    DateTime @default(now()) @db.DateTime(0)
+  updateAt    DateTime @default(now()) @db.DateTime(0)
+
+  @@index([store_id], map: "user_store_id_fk_idx")
+  @@index([position_id], map: "users_position_id_fk_idx")
+}
