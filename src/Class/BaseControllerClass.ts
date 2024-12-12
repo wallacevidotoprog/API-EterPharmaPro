@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../Enum/HttpStatus";
 import { IResponseBase } from "../Interface/IResponseBase";
-import CustomLogger from "../logger/CustomLogger";
 
 export abstract class BaseControllerClass<T> {
   protected abstract dbModel: any;
