@@ -52,6 +52,7 @@ export abstract class BaseControllerClass<T> {
       const entity: T = req.body as T;
       const result = await this.dbModel.INSERT(entity);
       res.status(HttpStatus.CREATED).json({
+        data:result,
         actionResult: true,
       } as IResponseBase<typeof result>);
     } catch (error) {
