@@ -1,8 +1,11 @@
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { HttpStatus } from "../Enum/HttpStatus";
 import { IResponseBase } from "../Interface/IResponseBase";
 
 export abstract class BaseControllerClass<T> {
+  protected prisma = new PrismaClient();
+  protected nameTable!:keyof PrismaClient;
   protected abstract dbModel: any;
   protected VallidateBody(req: Request, res: Response): boolean {
     try {
@@ -49,18 +52,29 @@ export abstract class BaseControllerClass<T> {
     if (!this.VallidateBody(req, res)) return;
 
     try {
-      const entity: T = req.body as T;
-      const result = await this.dbModel.INSERT(entity);
+      const entity:  T = req.body as T;
+      
+      const model:any = this.prisma[this.nameTable];
+      console.log(this.nameTable);
+      if (!model || !('create' in model)) {
+        throw new Error(`Método 'create' não encontrado para o modelo ${this.nameTable.toString()}`);
+      }
+      const result = await model.create({ data: entity });
+      
+      
+
       res.status(HttpStatus.CREATED).json({
-        data:result,
+        data: result?.id,
         actionResult: true,
-      } as IResponseBase<typeof result>);
+      } as IResponseBase<number|null>);
+      return;
     } catch (error) {
       console.log(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: error,
         actionResult: false,
       } as IResponseBase<typeof error>);
+      return;
     }
   }
 

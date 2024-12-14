@@ -1,10 +1,12 @@
 import mysql, { Pool } from "mysql2/promise";
 import dotenv from "dotenv";
+import { PrismaClient } from "@prisma/client";
 
 dotenv.config();
 
 let isConnected: boolean = false;
 let connection: Pool | null = null;
+const prisma = new PrismaClient();
 
 async function connectToDatabase() {
   try {
@@ -69,6 +71,7 @@ function getPool(): Pool {
         error
       );
     });
+    checkePrisma();
 })();
 
 process.on("SIGINT", async () => {
@@ -79,4 +82,17 @@ process.on("SIGINT", async () => {
   process.exit();
 });
 
+async function checkePrisma() {
+  try {
+    const result = await prisma.client.findFirst({ where: { cpf: '00000000000' } });
+    if (result) {
+      console.log("\x1b[33m[PRISMA]\x1b[36m✅ Prisma ok",);      
+    }
+  } catch (error) {
+    console.log("\x1b[33m[PRISMA]\x1b[36m❌ Prisma erro",error);
+  } finally {
+    await prisma.$disconnect();
+
+  }
+}
 export { connection, isConnected };
