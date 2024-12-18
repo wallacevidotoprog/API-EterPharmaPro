@@ -13,7 +13,7 @@ routerClient.put("/client/:id", AuthMiddleware.Authenticate ,  modelControllerCl
 
 routerClient.delete("/client/:id", AuthMiddleware.Authenticate ,  modelControllerCliente.DELETE.bind(modelControllerCliente));
 
-routerClient.get("/client/:id", AuthMiddleware.Authenticate ,  modelControllerCliente.GET.bind(modelControllerCliente));
+// routerClient.get("/client", AuthMiddleware.Authenticate ,  modelControllerCliente.GET.bind(modelControllerCliente));
 
 routerClient.get("/client", AuthMiddleware.Authenticate ,  modelControllerCliente.GETALL.bind(modelControllerCliente));
 

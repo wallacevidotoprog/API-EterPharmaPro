@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import { clientWhereInput } from './../../../node_modules/.prisma/client/index.d';
+import { query, Request, Response } from "express";
 import { HttpStatus } from "../../Enum/HttpStatus";
 import { IClientAddress } from "../../Interface/db/IClientAddress";
 import { IClients } from "../../Interface/db/IClients";
@@ -12,11 +13,9 @@ import { DefaultArgs } from "@prisma/client/runtime/library";
 export class ClientControllerClass extends BaseControllerClass<IClients> {
   protected nameTable: keyof PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs> = "client";
 
-  protected dbModel = new DbModel<IClients>(
-    new OperationsDbClass<IClients>("client")
-  );
-
+  
   public async qGET(req: Request, res: Response): Promise<void> {
+    
     try {
       const { type, cod } = req.query as { type?: string; cod?: string };
 
@@ -52,6 +51,7 @@ export class ClientControllerClass extends BaseControllerClass<IClients> {
       await this.prisma.$disconnect();
     }
   }
+  
 }
 
 export class ClientAddressControllerClass extends BaseControllerClass<IClientAddress> {

@@ -20,7 +20,7 @@ model address {
 }
 
 model client {
-  id       Int      @id @default(autoincrement())
+  id       Int      @id
   cpf      String?  @db.VarChar(45)
   rg       String?  @db.VarChar(45)
   name     String   @db.VarChar(45)
@@ -37,7 +37,6 @@ model client_address {
   updateAt   DateTime @default(now()) @db.DateTime(0)
 
   @@index([address_id], map: "client_address_addrees_fk_idx")
-  @@index([client_id], map: "client_address_client_fk_idx")
 }
 
 model delivery {
