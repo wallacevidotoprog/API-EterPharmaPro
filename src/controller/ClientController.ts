@@ -13,12 +13,7 @@ routerClient.put("/client/:id", AuthMiddleware.Authenticate ,  modelControllerCl
 
 routerClient.delete("/client/:id", AuthMiddleware.Authenticate ,  modelControllerCliente.DELETE.bind(modelControllerCliente));
 
-// routerClient.get("/client", AuthMiddleware.Authenticate ,  modelControllerCliente.GET.bind(modelControllerCliente));
-
 routerClient.get("/client", AuthMiddleware.Authenticate ,  modelControllerCliente.GETALL.bind(modelControllerCliente));
-
-routerClient.get("/client-query", AuthMiddleware.Authenticate ,  modelControllerCliente.qGET.bind(modelControllerCliente));
-
 
 //----- address
 routerClient.post("/client_address", AuthMiddleware.Authenticate, modelControllerAddress.CREATE.bind(modelControllerAddress));
@@ -32,6 +27,3 @@ routerClient.get("/client_address/:id", AuthMiddleware.Authenticate ,  modelCont
 routerClient.get("/client_address", AuthMiddleware.Authenticate ,  modelControllerAddress.GETALL.bind(modelControllerAddress));
 
 export default routerClient
-
-
-//query=cpf&cod=44461013820

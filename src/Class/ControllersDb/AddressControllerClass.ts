@@ -1,9 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
-import { IAddress } from "../../Interface/db/IAddress";
-import { DbModel } from "../../models/DbModel";
+import { IAddress, zAddress } from "../../Interface/db/IAddress";
 import { BaseControllerClass } from "../BaseControllerClass";
-import { OperationsDbClass } from "../OperationsDbClass";
 
 export class AddressControllerClass extends BaseControllerClass<IAddress> {
   protected nameTable: keyof PrismaClient<
@@ -11,7 +9,7 @@ export class AddressControllerClass extends BaseControllerClass<IAddress> {
     never,
     DefaultArgs
   > = "address";
-  protected dbModel = new DbModel<IAddress>(
-    new OperationsDbClass<IAddress>("address")
-  );
+  constructor() {
+    super(zAddress);
+  }
 }

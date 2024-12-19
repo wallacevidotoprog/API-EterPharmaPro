@@ -1,4 +1,5 @@
-import { IBaseDataBase } from "./IBaseDataBase";
+import { z } from "zod";
+import { IBaseDataBase, zBaseDatabase } from "./IBaseDataBase";
 
 export interface IClients extends IBaseDataBase{
     cpf?: string;
@@ -6,3 +7,10 @@ export interface IClients extends IBaseDataBase{
     name?: string;
     phone?: string;
 }
+
+export const zClients = zBaseDatabase.extend({
+    cpf: z.string().optional(),
+    rg: z.string().optional(),
+    name: z.string().optional(),
+    phone: z.string().optional(),
+})

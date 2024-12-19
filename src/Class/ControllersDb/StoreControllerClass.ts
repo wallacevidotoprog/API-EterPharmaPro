@@ -1,9 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
-import { IStore } from "../../Interface/db/IStore";
-import { DbModel } from "../../models/DbModel";
+import { IStore, zStore } from "../../Interface/db/IStore";
 import { BaseControllerClass } from "../BaseControllerClass";
-import { OperationsDbClass } from "../OperationsDbClass";
 
 export class StoreControllerClass extends BaseControllerClass<IStore> {
   protected nameTable: keyof PrismaClient<
@@ -11,7 +9,7 @@ export class StoreControllerClass extends BaseControllerClass<IStore> {
     never,
     DefaultArgs
   > = "store";
-  protected dbModel = new DbModel<IStore>(
-    new OperationsDbClass<IStore>("store")
-  );
+  constructor() {
+    super(zStore);
+  }
 }

@@ -2,13 +2,29 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { HttpStatus } from "../Enum/HttpStatus";
 import { IResponseBase } from "../Interface/IResponseBase";
+import { z, ZodError } from "zod";
 
 export abstract class BaseControllerClass<T> {
   protected prisma = new PrismaClient();
 
-  protected nameTable!: keyof PrismaClient;
-  protected model: any = this.prisma[this.nameTable];
+  private schema: z.ZodType<any>;  // Esquema Zod
 
+  constructor(schema: z.ZodType<any>) {
+    this.schema = schema;
+  }
+
+  protected nameTable!: keyof PrismaClient;
+
+  protected async validate(data: unknown): Promise<any> {
+    try {
+      return await this.schema.parseAsync(data); // Valida e transforma os dados
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new Error(`Validation failed for ${this.nameTable.toString()}: ${JSON.stringify(error.errors)}`);
+      }
+      throw new Error("Unexpected error during validation");
+    }
+  }
   protected VallidateBody(req: Request, res: Response): boolean {
     try {
       if (
@@ -79,6 +95,20 @@ export abstract class BaseControllerClass<T> {
           `Método 'create' não encontrado para o modelo ${this.nameTable.toString()}`
         );
       }
+
+     
+      // if (existingEntity) {
+      //   // Registro já existe, retorne um erro apropriado
+      //   res.status(HttpStatus.CONFLICT).json({
+      //     data: null,
+      //     actionResult: false,
+      //     message: "Registro já existe.",
+      //   } as IResponseBase<null>);
+      //   return;
+      // }
+
+
+
       const result = await model.create({ data: entity });
       res.status(HttpStatus.CREATED).json({
         data: result?.id,
@@ -150,7 +180,6 @@ export abstract class BaseControllerClass<T> {
 
   public async GET(req: Request, res: Response): Promise<void> {
 
-    throw new Error('Method old.');
     const id = this.ValidateParams(req, res, "id");
     try {
       const model: any = this.prisma[this.nameTable];
@@ -165,7 +194,7 @@ export abstract class BaseControllerClass<T> {
 
       //const whereCondition = this.buildWhereCondition(query);
 
-      const result = await model.findUnique({
+      const result = await model.findFirst({
        // where: whereCondition,
       });
       res.status(HttpStatus.OK).json({
@@ -190,15 +219,12 @@ export abstract class BaseControllerClass<T> {
           `Método 'findMany ' não encontrado para o modelo ${this.nameTable.toString()}`
         );
       }
-      //const query: Partial<T> = req.query as Partial<T>;
 
       
+      
+      const validatedData = await this.validate(req.query);
 
-      //const whereCondition = this.buildWhereCondition(query);
-
-      //console.log(whereCondition);
-
-      const result = await model.findMany({  });
+      const result = await model.findMany({ where:validatedData });
       const filters = req.query as Partial<Record<keyof typeof result, any>>;
       const filteredUsers = this.applyFilters(result, filters);
 

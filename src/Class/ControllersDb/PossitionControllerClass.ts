@@ -1,9 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
-import { IPosition } from "../../Interface/db/IPosition";
-import { DbModel } from "../../models/DbModel";
+import { IPosition, zPosition } from "../../Interface/db/IPosition";
 import { BaseControllerClass } from "../BaseControllerClass";
-import { OperationsDbClass } from "../OperationsDbClass";
 
 export class PossitionControllerClass extends BaseControllerClass<IPosition> {
   protected nameTable: keyof PrismaClient<
@@ -11,7 +9,7 @@ export class PossitionControllerClass extends BaseControllerClass<IPosition> {
     never,
     DefaultArgs
   > = "position";
-  protected dbModel = new DbModel<IPosition>(
-    new OperationsDbClass<IPosition>("position")
-  );
+  constructor() {
+    super(zPosition);
+  }
 }
