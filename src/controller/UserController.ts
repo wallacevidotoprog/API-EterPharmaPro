@@ -1,15 +1,15 @@
-import { IUsersResp } from './../Interface/IUsersResp';
+import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
-import { IUsers } from "./../Interface/db/IUsers";
-import { IResponseBase } from "./../Interface/IResponseBase";
-import { AuthMiddleware } from "../middlewares/AuthMiddleware";
-import { AuthService } from "../services/AuthService";
 import { OperationsDbClass } from "../Class/OperationsDbClass";
+import { HttpStatus } from "../Enum/HttpStatus";
 import { ILoginUser } from "../Interface/ILoginUser";
 import { IVerifyAuth } from "../Interface/IVerifyAuth";
+import { AuthMiddleware } from "../middlewares/AuthMiddleware";
 import { DbModel } from "../models/DbModel";
-import { HttpStatus } from "../Enum/HttpStatus";
-import { omitFields } from '../utils/globais';
+import { AuthService } from "../services/AuthService";
+import { omitFields } from "../utils/globais";
+import { IUsers, zUsers } from "./../Interface/db/IUsers";
+import { IResponseBase } from "./../Interface/IResponseBase";
 
 const routerUser = Router();
 const dbQueryModel = new DbModel<IUsers>(
@@ -91,8 +91,9 @@ routerUser.post("/login", async (req, res) => {
 });
 
 routerUser.post("/signup", async (req, res) => {
+  const prisma = new PrismaClient();
   try {
-    const objUser: IUsers = req.body;
+    const objUser: IUsers = req.body as IUsers;
 
     if (!objUser.email || !objUser.pass) {
       res.status(HttpStatus.BAD_REQUEST).json({
@@ -101,20 +102,21 @@ routerUser.post("/signup", async (req, res) => {
       } as IResponseBase<null>);
     }
 
-    objUser.pass = await AuthService.CryptPass(objUser.pass);
-    objUser.position_id = 1;
-    const [result]: any = await dbQueryModel.INSERT(objUser);
-
-    if (result && result.insertId) {
-      console.log("ID inserido:", result.insertId);
-    } else {
-      console.error("ID inserido não encontrado no resultado.");
+    if (objUser.pass) {
+      objUser.pass = await AuthService.CryptPass(objUser.pass);
     }
+    //objUser.position_id = 1;
+    
+    const validatedUser = zUsers.parse(objUser);
+    const result= await prisma.users.create({ data: validatedUser });
+
+    
 
     res.status(HttpStatus.CREATED).json({
       message: "Usuário registrado com sucesso!",
+      data:result,
       actionResult: true,
-    } as IResponseBase<null>);
+    } as IResponseBase<any>);
   } catch (error) {
     console.warn(error);
     res
@@ -124,7 +126,6 @@ routerUser.post("/signup", async (req, res) => {
 });
 
 routerUser.post("/logout", AuthMiddleware.eLogout, async (req, res) => {
-  
   res.status(HttpStatus.OK).json({
     message: "Logout realizado com sucesso.",
     actionResult: true,
@@ -279,9 +280,8 @@ routerUser.get("/users", AuthMiddleware.Authenticate, async (req, res) => {
     await dbQueryModel
       .GETALL()
       .then(async (data) => {
+        const tempUser = data.map((user: any) => omitFields(user, ["pass"]));
 
-        const tempUser= data.map((user: any) => omitFields(user, ["pass"]));
-        
         res.status(HttpStatus.OK).json({
           data: tempUser,
           actionResult: true,

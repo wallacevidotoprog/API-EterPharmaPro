@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 export interface IBaseDataBase {
-  id?: number;
+  id?: string;
   createAt?: Date;
-  updateAt?: Date; 
+  updateAt?: Date;
 }
 
 export const zBaseDatabase = z.object({
@@ -11,16 +11,23 @@ export const zBaseDatabase = z.object({
   //   message: "Expected a number for id",
   // }).transform(val => Number(val)).optional(),
   id: z
-  .union([
-    z.string().refine((val) => !isNaN(Number(val)), {
-      message: "Expected a number for id",
-    }).transform((val) => Number(val)),
-    z.array(
-      z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Expected a number for id",
-      }).transform((val) => Number(val))
-    ),
-  ]).optional(),
+    .union([
+      z
+        .string()
+        .refine((val) => !isNaN(Number(val)), {
+          message: "Expected a number for id",
+        })
+        .transform((val) => Number(val)),
+      z.array(
+        z
+          .string()
+          .refine((val) => !isNaN(Number(val)), {
+            message: "Expected a number for id",
+          })
+          .transform((val) => Number(val))
+      ),
+    ])
+    .optional(),
   createAt: z.date().optional(),
   updateAt: z.date().optional(),
-})
+});

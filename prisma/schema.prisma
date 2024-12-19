@@ -8,7 +8,7 @@ datasource db {
 }
 
 model address {
-  id           Int      @id @default(autoincrement())
+  id           String @id @default(uuid())
   cep          String?  @db.VarChar(45)
   place        String   @db.VarChar(45)
   number       String   @db.VarChar(45)
@@ -20,7 +20,7 @@ model address {
 }
 
 model client {
-  id       Int      @id
+  id       String @id @default(uuid())
   cpf      String?  @db.VarChar(45)
   rg       String?  @db.VarChar(45)
   name     String   @db.VarChar(45)
@@ -30,7 +30,7 @@ model client {
 }
 
 model client_address {
-  id         Int      @id @default(autoincrement())
+  id         String @id @default(uuid())
   client_id  Int?
   address_id Int?
   createAt   DateTime @default(now()) @db.DateTime(0)
@@ -40,7 +40,7 @@ model client_address {
 }
 
 model delivery {
-  id                Int       @id @default(autoincrement())
+  id                String @id @default(uuid())
   order_delivery_id Int?
   user_id           Int?
   date              DateTime  @db.DateTime(0)
@@ -54,7 +54,7 @@ model delivery {
 }
 
 model delivery_status {
-  id          Int      @id @default(autoincrement())
+  id          String @id @default(uuid())
   delivery_id Int?
   status_id   Int?
   createAt    DateTime @db.DateTime(0)
@@ -65,7 +65,7 @@ model delivery_status {
 }
 
 model maintenance_motor {
-  id                  Int      @id @default(autoincrement())
+  id                  String @id @default(uuid())
   type_maintenance_id Int?
   motorcycle_id       Int?
   date                DateTime @db.DateTime(0)
@@ -80,7 +80,7 @@ model maintenance_motor {
 }
 
 model motorcycle {
-  id       Int      @id @default(autoincrement())
+  id       String @id @default(uuid())
   store_id Int?
   model    String   @db.VarChar(45)
   year     Int
@@ -91,7 +91,7 @@ model motorcycle {
 }
 
 model order_delivery {
-  id            Int      @id @default(autoincrement())
+  id            String @id @default(uuid())
   user_id       Int?
   date          DateTime @db.DateTime(0)
   client_id     Int?
@@ -108,21 +108,21 @@ model order_delivery {
 }
 
 model permissions {
-  id       Int      @id @default(autoincrement())
+  id       String @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
 }
 
 model position {
-  id       Int      @id @default(autoincrement())
+  id       String @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
 }
 
 model position_permissions {
-  id             Int      @id @default(autoincrement())
+  id             String @id @default(uuid())
   user_id        Int?
   permissions_id Int?
   createAt       DateTime @default(now()) @db.DateTime(0)
@@ -133,14 +133,14 @@ model position_permissions {
 }
 
 model status {
-  id       Int      @id @default(autoincrement())
+  id       String @id @default(uuid())
   name     String   @db.VarChar(50)
   createAt DateTime @db.DateTime(0)
   updateAt DateTime @db.DateTime(0)
 }
 
 model store {
-  id         Int      @id @default(autoincrement())
+  id         String @id @default(uuid())
   filial     String   @db.VarChar(10)
   cnpj       String   @db.VarChar(20)
   name       String   @db.VarChar(100)
@@ -154,28 +154,28 @@ model store {
 }
 
 model type_maintenance {
-  id       Int      @id @default(autoincrement())
+  id       String @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
 }
 
 model type_order {
-  id       Int      @id @default(autoincrement())
+  id       String @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
 }
 
 model users {
-  id          Int      @id @default(autoincrement())
+  id          String @id @default(uuid())
   store_id    Int?
   email       String   @unique(map: "email_UNIQUE") @db.VarChar(45)
   phone       String   @db.VarChar(45)
   pass        String   @db.VarChar(60)
   name        String   @db.VarChar(45)
   position_id Int?
-  stats       Int      @db.TinyInt
+  stats       Boolean      @default(true)
   createAt    DateTime @default(now()) @db.DateTime(0)
   updateAt    DateTime @default(now()) @db.DateTime(0)
 

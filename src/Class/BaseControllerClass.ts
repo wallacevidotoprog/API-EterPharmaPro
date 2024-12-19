@@ -15,7 +15,7 @@ export abstract class BaseControllerClass<T> {
 
   protected nameTable!: keyof PrismaClient;
 
-  protected async validate(data: unknown): Promise<any> {
+  protected async ValidateQueryZod(data: unknown): Promise<any> {
     try {
       return await this.schema.parseAsync(data); // Valida e transforma os dados
     } catch (error) {
@@ -83,7 +83,7 @@ export abstract class BaseControllerClass<T> {
   }
 
   public async CREATE(req: Request, res: Response): Promise<void> {
-    if (!this.ValidateQuery(req, res)) return;
+    if (!this.VallidateBody(req, res)) return;
 
     try {
       const entity: T = req.body as T;
@@ -144,12 +144,8 @@ export abstract class BaseControllerClass<T> {
         actionResult: true,
       } as IResponseBase<typeof result>);
     } catch (error) {
-      console.log(error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        data: error,
-        actionResult: false,
-      } as IResponseBase<typeof error>);
-    }
+    this.handleError(res, error);
+  }
   }
 
   public async DELETE(req: Request, res: Response): Promise<void> {
@@ -170,21 +166,18 @@ export abstract class BaseControllerClass<T> {
         actionResult: true,
       } as IResponseBase<typeof result>);
     } catch (error) {
-      console.log(error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        data: error,
-        actionResult: false,
-      } as IResponseBase<typeof error>);
-    }
+    this.handleError(res, error);
+  }
   }
 
+  //arrumar ou excluir
   public async GET(req: Request, res: Response): Promise<void> {
 
     const id = this.ValidateParams(req, res, "id");
     try {
       const model: any = this.prisma[this.nameTable];
 
-      if (!model || !("findUnique" in model)) {
+      if (!model || !("findFirst" in model)) {
         throw new Error(
           `Método 'findUnique ' não encontrado para o modelo ${this.nameTable.toString()}`
         );
@@ -202,12 +195,8 @@ export abstract class BaseControllerClass<T> {
         actionResult: true,
       } as IResponseBase<typeof result>);
     } catch (error) {
-      console.log(error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        data: error,
-        actionResult: false,
-      } as IResponseBase<typeof error>);
-    }
+    this.handleError(res, error);
+  }
   }
 
   public async GETALL(req: Request, res: Response): Promise<void> {
@@ -218,97 +207,65 @@ export abstract class BaseControllerClass<T> {
         throw new Error(
           `Método 'findMany ' não encontrado para o modelo ${this.nameTable.toString()}`
         );
-      }
-
+      }     
       
-      
-      const validatedData = await this.validate(req.query);
+      const validatedData = await this.ValidateQueryZod(req.query);
 
       const result = await model.findMany({ where:validatedData });
-      const filters = req.query as Partial<Record<keyof typeof result, any>>;
-      const filteredUsers = this.applyFilters(result, filters);
 
 
       res.status(HttpStatus.OK).json({
-        data: filteredUsers,
+        data: result,
         actionResult: true,
       } as IResponseBase<typeof result>);
     } catch (error) {
-      console.log(error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        data: error,
-        actionResult: false,
-      } as IResponseBase<typeof error>);
+    this.handleError(res, error);
+  }
+  }
+  public async UPSERT(req: Request, res: Response): Promise<void> {
+    //POST /users/upsert?uniqueKey=email&uniqueValue=test@example.com
+    if (!this.VallidateBody(req, res)) return;
+  
+    try {
+      const entity: T = req.body as T;
+  
+      const model: any = this.prisma[this.nameTable];
+      if (!model || !("upsert" in model)) {
+        throw new Error(
+          `Método 'upsert' não encontrado para o modelo ${this.nameTable.toString()}`
+        );
+      }
+  
+      const uniqueKey = req.query.uniqueKey as keyof T;
+      const uniqueValue = req.query.uniqueValue;
+  
+      if (!uniqueKey || !uniqueValue) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          message: "É necessário informar a chave única e o valor para o upsert.",
+          actionResult: false,
+        } as IResponseBase<string>);
+        return;
+      }
+  
+      const result = await model.upsert({
+        where: { [uniqueKey]: uniqueValue }, // Condição de busca
+        update: entity, // Dados para atualizar, se o registro existir
+        create: entity, // Dados para criar, se o registro não existir
+      });
+  
+      res.status(HttpStatus.OK).json({
+        data: result,
+        actionResult: true,
+      } as IResponseBase<typeof result>);
+    } catch (error) {
+      this.handleError(res, error);
     }
   }
-
-  private applyFilters<T>(data: T[], filters: Partial<Record<keyof T, any>>): T[] {
-    return data.filter(item =>
-      Object.entries(filters).every(([key, value]) => {
-        // Verifica se o valor é igual ou contém (para strings)
-        if (typeof value === 'string' && typeof item[key as keyof T] === 'string') {
-          return (item[key as keyof T] as unknown as string)
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        }
-  
-        // Comparação estrita para outros tipos
-        return item[key as keyof T] == value; // "==" permite comparar string e número
-      })
-    );
+  private handleError(res: Response, error: unknown): void {
+    console.error(error);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      data: error,
+      actionResult: false,
+    } as IResponseBase<typeof error>);
   }
-  // private convertValueToType(value: any): any {
-  //   console.log("entrada", value);
-  //   if (!isNaN(Number(value))) {
-  //     console.log("isNaN(Number(value)):", value);
-  //     return Number(value);
-  //   } else if (value === "true" || value === "false") {
-  //     console.log("true||false:", value);
-  //     return value === "true" ? true : false;
-  //   }
-  //   // switch (false) {
-  //   //   case "number":
-  //   //     return isNaN(Number(value)) ? undefined : Number(value);
-  //   //   case "boolean":
-  //   //     return value === "true" ? true : value === "false" ? false : undefined;
-  //   //   case "object":
-  //   //     return !isNaN(Date.parse(value)) ? new Date(value) : undefined;
-  //   //   case "string":
-  //   //     return String(value);
-  //   //   default:
-  //   //     return value;
-  //   // }
-  // }
-  // private buildWhereCondition(query: Partial<T>): Prisma.clientWhereInput {
-  //   const whereCondition: Prisma.clientWhereInput = {};
-
-  //   for (const [key, value] of Object.entries(query)) {
-  //     // Se o valor for nulo ou indefinido, ignora
-  //     if (value == null) continue;
-  //     console.log("buildWhereCondition", value, typeof value);
-
-  //     // Converte o valor para o tipo adequado
-  //     whereCondition[key as keyof Prisma.clientWhereInput] =
-  //       this.convertValueToType(key, value);
-  //   }
-
-  //   return whereCondition;
-  // }
-
-  // private convertValueToType(field: string, value: any): any {
-  //   // Aqui você pode usar o schema para pegar o tipo do campo, mas vamos simplificar
-  //   switch (typeof value) {
-  //     case "string":
-  //       if (field.endsWith("Id")) {
-  //         return parseInt(value, 10); // Considerando que ids sejam numéricos
-  //       }
-  //       return value.trim(); // Para strings, remove espaços extras
-  //     // case 'boolean':
-  //     //   return value === 'true'; // Converte 'true' ou 'false' para booleano
-  //     case "number":
-  //       return value; // Se for número, mantém o valor
-  //     default:
-  //       return value;
-  //   }
-  // }
 }

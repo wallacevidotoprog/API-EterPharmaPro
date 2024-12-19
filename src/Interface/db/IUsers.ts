@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { IBaseDataBase, zBaseDatabase } from "./IBaseDataBase";
 export interface IUsers extends IBaseDataBase{
-  store_id?: string | null;
-  email: string;
-  phone: string;
-  pass: string;
-  name: string;
-  position_id?: string | null;
-  permissions_id ?: string | null;
-  stats: boolean;
+  store_id?: string ;
+  email?: string;
+  phone?: string;
+  pass?: string;
+  name?: string;
+  position_id?: string ;
+  permissions_id ?: string;
+  stats?: boolean;
 }
 export const zUsers = zBaseDatabase.extend({
   store_id: z.string().optional(),
