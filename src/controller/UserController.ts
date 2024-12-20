@@ -108,7 +108,7 @@ routerUser.post("/signup", async (req, res) => {
     //objUser.position_id = 1;
     
     const validatedUser = zUsers.parse(objUser);
-    const result= await prisma.users.create({ data: validatedUser });
+    const result= await prisma.users.create({ data: datas });
 
     
 

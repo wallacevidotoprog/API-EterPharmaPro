@@ -2,6 +2,8 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { Request, Response } from "express";
 import { HttpStatus } from "../../Enum/HttpStatus";
+import { zAddress } from "../../Interface/db/IAddress";
+import { zClients } from "../../Interface/db/IClients";
 import { IDelivery, zDelivery } from "../../Interface/db/IDelivery";
 import {
   IDeliveryStatus,
@@ -37,11 +39,10 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
     super(zOrderDelivery);
   }
   public async CREATE(req: Request, res: Response): Promise<void> {
-    
     if (req.query.type && req.query.type === "full") {
       try {
         const { order, client, address }: IOrderDeliveryFull = req.body;
-        
+
         if (!client || !address) {
           res.status(HttpStatus.BAD_REQUEST).json({
             message: "Faltou inserir o cliente e/ou endereço",
@@ -49,7 +50,6 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
           } as IResponseBase<string>);
           return;
         }
-        
 
         //CLIENTE
         const returnClient = await this.prisma.client.findFirst({
@@ -57,21 +57,23 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
             OR: [{ cpf: client.cpf }, { rg: client.rg }],
           },
         });
-        
+
         if (returnClient) {
           order.client_id = returnClient.id;
         } else {
-          const validatedData = await this.ValidateQueryZod(client);
+          const validatedData = await zClients.parseAsync(client);
+
+          // @ts-ignore
           const returnClient = await this.prisma.client.create({
+             // @ts-ignore
             data: validatedData,
           });
           if (returnClient) {
             order.client_id = returnClient.id;
           }
         }
-        
+
         //ENDEREÇO
-        //**não esta entrenaod aqui */
         const returnAddres = await this.prisma.address.findFirst({
           where: {
             OR: [{ cep: address.cep }, { number: address.number }],
@@ -80,25 +82,48 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
         if (returnAddres) {
           order.address_id = returnAddres.id;
         } else {
-          const validatedData = await this.ValidateQueryZod(address);
+          const validatedData = await zAddress.parseAsync(address);
+         
           const returnAddres = await this.prisma.address.create({
+             // @ts-ignore
             data: validatedData,
           });
           if (returnAddres) {
             order.address_id = returnAddres.id;
           }
-          console.log('entrou',order);
         }
+
+        //RELAÇAÕ CLIENTE ENDEREÇO
+        const returnCE = await this.prisma.client_address.findFirst({
+          where: {
+            AND: [
+              { client_id: order.client_id },
+              { address_id: order.address_id },
+            ],
+          },
+        });
+        if (!returnCE) {
+          const returnAddres = await this.prisma.client_address.create({
+            data: {
+              client_id: order.client_id,
+              address_id: order.address_id,
+            },
+          });
+          if (returnAddres) {
+            order.address_id = returnAddres.id;
+          }
+        }
+
+        order.date = new Date(order.date);
         req.body = order;
-        console.log('body depois do refino=>',req.body);
-        
+
         await super.CREATE(req, res);
       } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
           data: error,
           actionResult: false,
         } as IResponseBase<typeof error>);
-        return
+        return;
       }
     } else {
       await super.CREATE(req, res);

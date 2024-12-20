@@ -2,11 +2,11 @@ import { z } from "zod";
 import { IBaseDataBase, zBaseDatabase } from "./IBaseDataBase";
 
 export interface IOrderDelivery extends IBaseDataBase{
-    user_id?: string | null;
+    user_id?: string ;
     date: Date;
-    client_id?: string | null;
-    address_id?: string | null;
-    type_order_id?: string | null;
+    client_id?: string ;
+    address_id?: string ;
+    type_order_id?: string ;
     value: number;
 }
 
