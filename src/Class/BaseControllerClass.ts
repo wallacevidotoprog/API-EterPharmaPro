@@ -1,3 +1,4 @@
+import { client_address } from './../../node_modules/.prisma/client/index.d';
 import { Prisma, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { HttpStatus } from "../Enum/HttpStatus";
@@ -209,9 +210,40 @@ export abstract class BaseControllerClass<T> {
         );
       }     
       
+
       const validatedData = await this.ValidateQueryZod(req.query);
 
-      const result = await model.findMany({ where:validatedData });
+      const result = await model.findMany({ where:validatedData  });
+
+
+      res.status(HttpStatus.OK).json({
+        data: result,
+        actionResult: true,
+      } as IResponseBase<typeof result>);
+    } catch (error) {
+    this.handleError(res, error);
+  }
+  }
+  
+  public async GETALLFULL(req: Request, res: Response): Promise<void> {
+    try {
+      const model: any = this.prisma[this.nameTable];
+
+      if (!model || !("findMany" in model)) {
+        throw new Error(
+          `Método 'findMany ' não encontrado para o modelo ${this.nameTable.toString()}`
+        );
+      }   
+      
+      const relationsMap: Record<string, any>  = {
+        client_address: {address:true,client:true}
+      };
+      
+      const includeRelations = relationsMap[this.nameTable as string] || undefined;
+      
+      const validatedData = await this.ValidateQueryZod(req.query);
+
+      const result = await model.findMany({ where:validatedData ,include: includeRelations});
 
 
       res.status(HttpStatus.OK).json({

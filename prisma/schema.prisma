@@ -17,26 +17,33 @@ model address {
   uf           String   @db.VarChar(2)
   createAt     DateTime @default(now()) @db.DateTime(0)
   updateAt     DateTime @default(now()) @db.DateTime(0)
+
+  client_address client_address[]
 }
 
 model client {
   id       String @id @default(uuid())
-  cpf      String?  @db.VarChar(45)
-  rg       String?  @db.VarChar(45)
+  cpf      String?  @db.VarChar(45)@unique
+  rg       String?  @db.VarChar(45)@unique
   name     String   @db.VarChar(45)
   phone    String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
+
+  client_address client_address[]
 }
 
 model client_address {
   id         String @id @default(uuid())
-  client_id  Int?
-  address_id Int?
+  client_id  String
+  address_id String
   createAt   DateTime @default(now()) @db.DateTime(0)
   updateAt   DateTime @default(now()) @db.DateTime(0)
 
+  client     client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  address    address  @relation(fields: [address_id], references: [id], onDelete: Cascade)
   @@index([address_id], map: "client_address_addrees_fk_idx")
+  @@unique([client_id, address_id], map: "unique_client_address")
 }
 
 model delivery {

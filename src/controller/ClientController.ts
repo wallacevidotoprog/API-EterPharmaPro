@@ -7,13 +7,14 @@ const routerClient = Router();
 const modelControllerCliente = new ClientControllerClass();
 const modelControllerAddress = new ClientAddressControllerClass();
 
-routerClient.post("/client", AuthMiddleware.Authenticate, modelControllerCliente.CREATE.bind(modelControllerCliente));
+routerClient.post("/client", AuthMiddleware.Authenticate, modelControllerCliente.UPSERT.bind(modelControllerCliente));
 
 routerClient.put("/client/:id", AuthMiddleware.Authenticate ,  modelControllerCliente.UPDATE.bind(modelControllerCliente))
 
 routerClient.delete("/client/:id", AuthMiddleware.Authenticate ,  modelControllerCliente.DELETE.bind(modelControllerCliente));
 
 routerClient.get("/client", AuthMiddleware.Authenticate ,  modelControllerCliente.GETALL.bind(modelControllerCliente));
+routerClient.get("/client-all", AuthMiddleware.Authenticate ,  modelControllerCliente.GETALLFULL.bind(modelControllerCliente));
 
 //----- address
 routerClient.post("/client_address", AuthMiddleware.Authenticate, modelControllerAddress.CREATE.bind(modelControllerAddress));
