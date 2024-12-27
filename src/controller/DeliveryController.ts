@@ -21,6 +21,8 @@ routerDelivery.get("/order_delivery/:id",AuthMiddleware.Authenticate,  modelCont
 
 routerDelivery.get("/order_delivery",  AuthMiddleware.Authenticate, modelControllerOrder.GETALL.bind(modelControllerOrder));
 
+routerDelivery.get("/order_view",  AuthMiddleware.Authenticate, modelControllerOrder.GETVIEW.bind(modelControllerOrder));
+
 
 //--- Delivery
 routerDelivery.post("/delivery", AuthMiddleware.Authenticate, modelController.CREATE.bind(modelController));

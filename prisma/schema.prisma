@@ -8,7 +8,7 @@ datasource db {
 }
 
 model address {
-  id           String @id @default(uuid())
+  id           String   @id @default(uuid())
   cep          String?  @db.VarChar(45)
   place        String   @db.VarChar(45)
   number       String   @db.VarChar(45)
@@ -17,37 +17,31 @@ model address {
   uf           String   @db.VarChar(2)
   createAt     DateTime @default(now()) @db.DateTime(0)
   updateAt     DateTime @default(now()) @db.DateTime(0)
-
-  client_address client_address[]
 }
 
 model client {
-  id       String @id @default(uuid())
-  cpf      String?  @db.VarChar(45)@unique
-  rg       String?  @db.VarChar(45)@unique
+  id       String   @id @default(uuid())
+  cpf      String?  @unique @db.VarChar(45)
+  rg       String?  @unique @db.VarChar(45)
   name     String   @db.VarChar(45)
   phone    String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
-
-  client_address client_address[]
 }
 
 model client_address {
-  id         String @id @default(uuid())
+  id         String   @id @default(uuid())
   client_id  String?
   address_id String?
   createAt   DateTime @default(now()) @db.DateTime(0)
   updateAt   DateTime @default(now()) @db.DateTime(0)
 
-  client     client?   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  address    address?  @relation(fields: [address_id], references: [id], onDelete: Cascade)
-  @@index([address_id], map: "client_address_addrees_fk_idx")
   @@unique([client_id, address_id], map: "unique_client_address")
+  @@index([address_id], map: "client_address_addrees_fk_idx")
 }
 
 model delivery {
-  id                String @id @default(uuid())
+  id                String    @id @default(uuid())
   order_delivery_id String?
   user_id           String?
   date              DateTime  @db.DateTime(0)
@@ -61,7 +55,7 @@ model delivery {
 }
 
 model delivery_status {
-  id          String @id @default(uuid())
+  id          String   @id @default(uuid())
   delivery_id String?
   status_id   String?
   createAt    DateTime @db.DateTime(0)
@@ -72,7 +66,7 @@ model delivery_status {
 }
 
 model maintenance_motor {
-  id                  String @id @default(uuid())
+  id                  String   @id @default(uuid())
   type_maintenance_id String?
   motorcycle_id       String?
   date                DateTime @db.DateTime(0)
@@ -87,7 +81,7 @@ model maintenance_motor {
 }
 
 model motorcycle {
-  id       String @id @default(uuid())
+  id       String   @id @default(uuid())
   store_id String?
   model    String   @db.VarChar(45)
   year     Int
@@ -98,16 +92,16 @@ model motorcycle {
 }
 
 model order_delivery {
-  id            String @id @default(uuid())
+  id            String   @id @default(uuid())
   user_id       String?
   date          DateTime @db.DateTime(0)
   client_id     String?
   address_id    String?
   type_order_id String?
   value         Decimal  @db.Decimal(10, 2)
-  obs String?
   createAt      DateTime @default(now()) @db.DateTime(0)
   updateAt      DateTime @default(now()) @db.DateTime(0)
+  obs           String?
 
   @@index([address_id], map: "order_delivery_address_fk_idx")
   @@index([client_id], map: "order_delivery_client_fk_idx")
@@ -116,21 +110,21 @@ model order_delivery {
 }
 
 model permissions {
-  id       String @id @default(uuid())
+  id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
 }
 
 model position {
-  id       String @id @default(uuid())
+  id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
 }
 
 model position_permissions {
-  id             String @id @default(uuid())
+  id             String   @id @default(uuid())
   user_id        String?
   permissions_id String?
   createAt       DateTime @default(now()) @db.DateTime(0)
@@ -141,14 +135,14 @@ model position_permissions {
 }
 
 model status {
-  id       String @id @default(uuid())
+  id       String   @id @default(uuid())
   name     String   @db.VarChar(50)
   createAt DateTime @db.DateTime(0)
   updateAt DateTime @db.DateTime(0)
 }
 
 model store {
-  id         String @id @default(uuid())
+  id         String   @id @default(uuid())
   filial     String   @db.VarChar(10)
   cnpj       String   @db.VarChar(20)
   name       String   @db.VarChar(100)
@@ -162,31 +156,48 @@ model store {
 }
 
 model type_maintenance {
-  id       String @id @default(uuid())
+  id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
 }
 
 model type_order {
-  id       String @id @default(uuid())
+  id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
 }
 
 model users {
-  id          String @id @default(uuid())
+  id          String   @id @default(uuid())
   store_id    String?
   email       String   @unique(map: "email_UNIQUE") @db.VarChar(45)
   phone       String   @db.VarChar(45)
   pass        String   @db.VarChar(60)
   name        String   @db.VarChar(45)
   position_id String?
-  stats       Boolean      @default(true)
+  stats       Boolean  @default(true)
   createAt    DateTime @default(now()) @db.DateTime(0)
   updateAt    DateTime @default(now()) @db.DateTime(0)
 
   @@index([store_id], map: "user_store_id_fk_idx")
   @@index([position_id], map: "users_position_id_fk_idx")
+}
+
+
+model view_order {
+ id       String   @id @default(uuid())
+ name_user     String?   @db.VarChar(45)
+ date     DateTime?
+ client_name     String?   @db.VarChar(45)
+ place     String?   @db.VarChar(45)
+ number     Int?  
+ neighborhood     String?   @db.VarChar(45)
+ city     String?  @db.VarChar(45)
+ uf     String?   @db.VarChar(45)
+ name_order     String?   @db.VarChar(45)
+ value     Decimal?  @db.Decimal(10, 2)
+ obs     String?   @db.VarChar(45)
+ @@map("view_order")
 }

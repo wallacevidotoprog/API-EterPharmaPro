@@ -1,3 +1,4 @@
+import { view_order } from './../../../node_modules/.prisma/client/index.d';
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { Request, Response } from "express";
@@ -35,6 +36,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
     never,
     DefaultArgs
   > = "order_delivery";
+    
   constructor() {
     super(zOrderDelivery);
   }
@@ -109,12 +111,9 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
               address_id: order.address_id,
             },
           });
-          if (returnAddres) {
-            order.address_id = returnAddres.id;
-          }
         }
 
-        order.date = new Date(order.date);
+        //order.date = new Date(order.date);
         req.body = order;
 
         await super.CREATE(req, res);
@@ -128,6 +127,25 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
     } else {
       await super.CREATE(req, res);
     }
+  }
+
+  public async GETVIEW(req: Request, res: Response): Promise<void>{
+    try {
+      const result = await this.prisma.view_order.findMany();
+
+
+
+      res.status(HttpStatus.OK).json({
+        data: result,
+        actionResult: true,
+      } as IResponseBase<typeof result>);
+      
+    } catch (error) {
+      this.handleError(res, error);
+    }
+
+
+
   }
 }
 

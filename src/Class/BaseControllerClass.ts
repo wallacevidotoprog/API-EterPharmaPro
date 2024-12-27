@@ -293,7 +293,7 @@ export abstract class BaseControllerClass<T> {
       this.handleError(res, error);
     }
   }
-  private handleError(res: Response, error: unknown): void {
+  protected handleError(res: Response, error: unknown): void {
     console.error(error);
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       data: error,
