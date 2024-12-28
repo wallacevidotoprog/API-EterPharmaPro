@@ -199,5 +199,6 @@ model view_order {
  name_order     String?   @db.VarChar(45)
  value     Decimal?  @db.Decimal(10, 2)
  obs     String?   @db.VarChar(45)
+
  @@map("view_order")
 }

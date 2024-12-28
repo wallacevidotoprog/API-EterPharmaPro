@@ -1,4 +1,3 @@
-import { view_order } from './../../../node_modules/.prisma/client/index.d';
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { Request, Response } from "express";
@@ -36,10 +35,11 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
     never,
     DefaultArgs
   > = "order_delivery";
-    
+
   constructor() {
     super(zOrderDelivery);
   }
+
   public async CREATE(req: Request, res: Response): Promise<void> {
     if (req.query.type && req.query.type === "full") {
       try {
@@ -67,7 +67,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
 
           // @ts-ignore
           const returnClient = await this.prisma.client.create({
-             // @ts-ignore
+            // @ts-ignore
             data: validatedData,
           });
           if (returnClient) {
@@ -85,9 +85,9 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
           order.address_id = returnAddres.id;
         } else {
           const validatedData = await zAddress.parseAsync(address);
-         
+
           const returnAddres = await this.prisma.address.create({
-             // @ts-ignore
+            // @ts-ignore
             data: validatedData,
           });
           if (returnAddres) {
@@ -129,23 +129,103 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
     }
   }
 
-  public async GETVIEW(req: Request, res: Response): Promise<void>{
+  public async GETVIEW(req: Request, res: Response): Promise<void> {
+    //const result = await model.findMany({ where:validatedData ,include: includeRelations});
     try {
-      const result = await this.prisma.view_order.findMany();
+      let whereCondition = {};
+      console.log(req.query);
+      
+      if (req.query) {
+        const { date } = req.query;
+        if (date) {
+          if (typeof date === "string") {
+            const selectedDate = new Date(date.split("T")[0]);
+            const startOfDay = new Date(selectedDate);
+            startOfDay.setUTCHours(0, 0, 0, 0);
 
+            const endOfDay = new Date(selectedDate);
+            endOfDay.setUTCHours(23, 59, 59, 999);
 
+            whereCondition = {
+              date: {
+                gte: startOfDay,
+                lte: endOfDay,
+              },
+            };
+
+            console.log(whereCondition);
+          }
+        }
+      }
+
+      const orders = await this.prisma.view_order.findMany({
+        where: whereCondition,
+      });
+
+      if (orders.length === 0) {
+        res.status(HttpStatus.OK).json({
+          data: [],
+          actionResult: true,
+        } as IResponseBase<typeof orders>);
+        return;
+      }
+
+      const orderIds = orders
+        .map((order) => order.id)
+        .filter(Boolean) as string[];
+
+      const deliveries = await this.prisma.delivery.findMany({
+        where: { order_delivery_id: { in: orderIds } },
+      });
+
+      const deliveryIds = deliveries
+        .map((delivery) => delivery.id)
+        .filter(Boolean) as string[];
+
+      const deliveryStatuses = await this.prisma.delivery_status.findMany({
+        where: { delivery_id: { in: deliveryIds } },
+      });
+
+      const statusIds = deliveryStatuses
+        .map((status) => status.status_id)
+        .filter(Boolean) as string[];
+
+      const statuses = await this.prisma.status.findMany({
+        where: { id: { in: statusIds } },
+        select: { id: true, name: true },
+      });
+
+      const enrichedOrders = orders.map((order) => {
+        const delivery = deliveries.find(
+          (d) => d.order_delivery_id === order.id
+        );
+        const deliveryStatus = deliveryStatuses.find(
+          (ds) => ds.delivery_id === delivery?.id
+        );
+        const status = statuses.filter(
+          (s) => s.id === deliveryStatus?.status_id
+        );
+
+        const result: any = { order };
+
+        if (delivery) {
+          result.delivery = delivery;
+        }
+
+        if (status.length > 0) {
+          result.status = status;
+        }
+
+        return result;
+      });
 
       res.status(HttpStatus.OK).json({
-        data: result,
+        data: enrichedOrders,
         actionResult: true,
-      } as IResponseBase<typeof result>);
-      
+      } as IResponseBase<typeof enrichedOrders>);
     } catch (error) {
       this.handleError(res, error);
     }
-
-
-
   }
 }
 
