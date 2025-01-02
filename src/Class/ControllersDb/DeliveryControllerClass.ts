@@ -130,10 +130,8 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
   }
 
   public async GETVIEW(req: Request, res: Response): Promise<void> {
-    //const result = await model.findMany({ where:validatedData ,include: includeRelations});
     try {
-      let whereCondition = {};
-      console.log(req.query);
+      let whereCondition = {};     
       
       if (req.query) {
         const { date } = req.query;
