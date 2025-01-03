@@ -131,8 +131,8 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
 
   public async GETVIEW(req: Request, res: Response): Promise<void> {
     try {
-      let whereCondition = {};     
-      
+      let whereCondition = {};
+
       if (req.query) {
         const { date } = req.query;
         if (date) {
@@ -150,8 +150,6 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
                 lte: endOfDay,
               },
             };
-
-            console.log(whereCondition);
           }
         }
       }
@@ -182,6 +180,12 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
 
       const deliveryStatuses = await this.prisma.delivery_status.findMany({
         where: { delivery_id: { in: deliveryIds } },
+        select: {
+          id: true,
+          status_id: true,
+          createAt: true,
+          delivery_id: true,
+        },
       });
 
       const statusIds = deliveryStatuses
@@ -200,9 +204,11 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
         const deliveryStatus = deliveryStatuses.find(
           (ds) => ds.delivery_id === delivery?.id
         );
+
         const status = statuses.filter(
           (s) => s.id === deliveryStatus?.status_id
         );
+        const statusMap = new Map(statuses.map((s) => [s.id, s]));
 
         const result: any = { order };
 
@@ -211,7 +217,20 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
         }
 
         if (status.length > 0) {
-          result.status = status;
+          //result.status = status;
+          result.status = deliveryStatuses
+            .map((deliveryStatus) => {
+              if (!deliveryStatus.status_id) return null;
+
+              const status = statusMap.get(deliveryStatus.status_id);
+              return status
+                ? {
+                    name:status.name,
+                    create: deliveryStatus.createAt, 
+                  }
+                : null;
+            })
+            .filter(Boolean);
         }
 
         return result;
