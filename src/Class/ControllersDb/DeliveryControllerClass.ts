@@ -153,7 +153,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
           }
         }
       }
-
+ 
       const orders = await this.prisma.view_order.findMany({
         where: whereCondition,
       });
