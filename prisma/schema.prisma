@@ -46,7 +46,6 @@ model delivery {
   user_id           String?
   date              DateTime  @db.DateTime(0)
   motor_kilometers  Int
-  date_completed    DateTime? @db.DateTime(0)
   createAt          DateTime  @default(now()) @db.DateTime(0)
   updateAt          DateTime  @default(now()) @db.DateTime(0)
 
