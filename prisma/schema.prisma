@@ -49,6 +49,10 @@ model delivery {
   createAt          DateTime  @default(now()) @db.DateTime(0)
   updateAt          DateTime  @default(now()) @db.DateTime(0)
 
+  delivery_status   delivery_status[]
+
+  order_delivery order_delivery? @relation(fields: [order_delivery_id],references: [id])
+
   @@index([order_delivery_id], map: "delivery_order_delivery_id_fk_idx")
   @@index([user_id], map: "delivery_userid_fk,_idx")
 }
@@ -57,8 +61,12 @@ model delivery_status {
   id          String   @id @default(uuid())
   delivery_id String?
   status_id   String?
-  createAt    DateTime @db.DateTime(0)
-  updateAt    DateTime @db.DateTime(0)
+  createAt    DateTime  @default(now()) @db.DateTime(0)
+  updateAt    DateTime  @default(now()) @db.DateTime(0)
+
+  
+  delivery delivery? @relation(fields: [delivery_id],references: [id])
+  status status? @relation(fields: [status_id],references: [id])
 
   @@index([delivery_id], map: "delivery_status_delivery_fk_idx")
   @@index([status_id], map: "delivery_status_status_id_fk_idx")
@@ -106,6 +114,7 @@ model order_delivery {
   @@index([client_id], map: "order_delivery_client_fk_idx")
   @@index([type_order_id], map: "order_delivery_type_order_fk_idx")
   @@index([user_id], map: "order_delivery_user_fk_idx")
+  delivery delivery[]
 }
 
 model permissions {
@@ -138,6 +147,8 @@ model status {
   name     String   @db.VarChar(50)
   createAt DateTime @db.DateTime(0)
   updateAt DateTime @db.DateTime(0)
+
+  delivery_status delivery_status[]
 }
 
 model store {

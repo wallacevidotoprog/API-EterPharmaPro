@@ -15,6 +15,7 @@ import {
 } from "../../Interface/db/IOrderDelivery";
 import { IStatus, zStatus } from "../../Interface/db/IStatus";
 import { ITypeOrder, zTypeOrder } from "../../Interface/db/ITypeOrder";
+import { IDeliveryReq } from "../../Interface/IDeliveryReq";
 import { IOrderDeliveryFull } from "../../Interface/IOrderDeliveryFull";
 import { IResponseBase } from "../../Interface/IResponseBase";
 import { BaseControllerClass } from "../BaseControllerClass";
@@ -27,6 +28,175 @@ export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
   > = "delivery";
   constructor() {
     super(zDelivery);
+  }
+
+  public async CREATE(req: Request, res: Response): Promise<void> {
+    try {
+      if (req.query.type && req.query.type === "full") {
+        const tempBody: IDeliveryReq = req.body;
+        console.log(tempBody);
+        
+        // if (!tempBody) {
+        //   res.status(HttpStatus.BAD_REQUEST).json({
+        //     message: "Faltou inserir o delivery e/ou status",
+        //     actionResult: false,
+        //   } as IResponseBase<string>);
+        //   return;
+        // }
+
+        if (!tempBody || !tempBody.order_delivery_id || !tempBody.status_id) {
+          res.status(HttpStatus.BAD_REQUEST).json({
+            message: "Faltou inserir o delivery e/ou status",
+            actionResult: false,
+          } as IResponseBase<string>);
+          return;
+        }
+
+        const processOrderDelivery = async (element: string) => {
+          const existingDelivery = await this.prisma.delivery.findFirst({
+            where: { order_delivery_id: element },
+          });
+          
+          
+          
+          if (existingDelivery) {
+           
+            await this.prisma.delivery_status.create({
+              data: {
+                delivery_id: existingDelivery.id,
+                status_id: tempBody.status_id,
+              },
+            });
+            return existingDelivery.id;
+          } else {
+            const newDelivery = await this.prisma.delivery.create({
+              data: {
+                date: tempBody.date,
+                motor_kilometers: tempBody.motor_kilometers,
+                order_delivery_id: element,
+                user_id: tempBody.user_id,
+              } as IDelivery,
+            });
+            console.log('newDelivery',newDelivery);
+
+            await this.prisma.delivery_status.create({
+              data: {
+                delivery_id: newDelivery.id,
+                status_id: tempBody.status_id,
+              },
+            }) as IDeliveryStatus;
+            
+            return newDelivery.id;
+          }
+        };
+
+        const deliverysIds = await Promise.all(                    
+          tempBody.order_delivery_id.map((id) => processOrderDelivery(id))
+        );
+
+        res.status(HttpStatus.CREATED).json({
+          data: deliverysIds,
+          actionResult: true,
+        } as IResponseBase<string[]>);
+
+        // if (tempBody.order_delivery_id) {
+        //   for (
+        //     let index = 0;
+        //     index < tempBody.order_delivery_id.length;
+        //     index++
+        //   ) {
+        //     const element = tempBody.order_delivery_id[index];
+
+        //     await this.prisma.delivery
+        //       .findFirst({
+        //         where: { order_delivery_id: element },
+        //       })
+        //       .then(async (data) => {
+        //         if (data) {
+        //           await this.prisma.delivery_status
+        //             .create({
+        //               data: {
+        //                 delivery_id: data.id,
+        //                 status_id: tempBody.status_id,
+        //               },
+        //             })
+        //             .then((data) => {
+        //               res.status(HttpStatus.CREATED).json({
+        //                 data: data.id,
+        //                 actionResult: true,
+        //               } as IResponseBase<string | null>);
+        //               return;
+        //             })
+        //             .catch((error) => {
+        //               res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        //                 data: error,
+        //                 actionResult: false,
+        //               } as IResponseBase<typeof error>);
+        //               return;
+        //             });
+        //         } else {
+        //           await this.prisma.delivery
+        //             .create({
+        //               data: {
+        //                 date: tempBody.date,
+        //                 motor_kilometers: tempBody.motor_kilometers,
+        //                 order_delivery_id: element,
+        //                 user_id: tempBody.user_id,
+        //               },
+        //             })
+        //             .then(async (date) => {
+        //               await this.prisma.delivery_status
+        //                 .create({
+        //                   data: {
+        //                     delivery_id: date.id,
+        //                     status_id: tempBody.status_id,
+        //                   },
+        //                 })
+        //                 .then((data) => {
+        //                   res.status(HttpStatus.CREATED).json({
+        //                     data: data.id,
+        //                     actionResult: true,
+        //                   } as IResponseBase<string | null>);
+        //                   return;
+        //                 })
+        //                 .catch((error) => {
+        //                   res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        //                     data: error,
+        //                     actionResult: false,
+        //                   } as IResponseBase<typeof error>);
+        //                   return;
+        //                 });
+        //             })
+        //             .catch((error) => {
+        //               res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        //                 data: error,
+        //                 actionResult: false,
+        //               } as IResponseBase<typeof error>);
+        //               return;
+        //             });
+        //         }
+        //       })
+        //       .catch((error) => {
+        //         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        //           data: error,
+        //           actionResult: false,
+        //         } as IResponseBase<typeof error>);
+        //         return;
+        //       });
+        //   }
+        // }
+      } else {
+        await super.CREATE(req, res);
+      }
+    } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: {
+          try:true,
+          error
+        },
+        actionResult: false,
+      } as IResponseBase<any>);return
+    }
   }
 }
 export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDelivery> {
@@ -153,9 +323,19 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
           }
         }
       }
- 
-      const orders = await this.prisma.view_order.findMany({
+
+      
+      const ordertts = await this.prisma.order_delivery.findMany({        
         where: whereCondition,
+        include:
+        
+      });
+      
+      console.log('ordertts',ordertts);
+      const orders = await this.prisma.view_order.findMany({
+        
+        where: whereCondition,
+        
       });
 
       if (orders.length === 0) {
@@ -209,7 +389,10 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
           (s) => s.id === deliveryStatus?.status_id
         );
         const statusMap = new Map(statuses.map((s) => [s.id, s]));
-
+        console.log('statuses',statuses);
+        console.log('status',status);
+        console.log('statusMap',statusMap);
+        
         const result: any = { order };
 
         if (delivery) {
@@ -225,8 +408,8 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
               const status = statusMap.get(deliveryStatus.status_id);
               return status
                 ? {
-                    name:status.name,
-                    create: deliveryStatus.createAt, 
+                    name: status.name,
+                    create: deliveryStatus.createAt,
                   }
                 : null;
             })
