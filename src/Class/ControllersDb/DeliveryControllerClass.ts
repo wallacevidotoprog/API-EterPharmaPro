@@ -1,3 +1,4 @@
+import { address } from './../../../node_modules/.prisma/client/index.d';
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { Request, Response } from "express";
@@ -35,7 +36,7 @@ export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
       if (req.query.type && req.query.type === "full") {
         const tempBody: IDeliveryReq = req.body;
         console.log(tempBody);
-        
+
         // if (!tempBody) {
         //   res.status(HttpStatus.BAD_REQUEST).json({
         //     message: "Faltou inserir o delivery e/ou status",
@@ -56,11 +57,8 @@ export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
           const existingDelivery = await this.prisma.delivery.findFirst({
             where: { order_delivery_id: element },
           });
-          
-          
-          
+
           if (existingDelivery) {
-           
             await this.prisma.delivery_status.create({
               data: {
                 delivery_id: existingDelivery.id,
@@ -77,20 +75,20 @@ export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
                 user_id: tempBody.user_id,
               } as IDelivery,
             });
-            console.log('newDelivery',newDelivery);
+            console.log("newDelivery", newDelivery);
 
-            await this.prisma.delivery_status.create({
+            (await this.prisma.delivery_status.create({
               data: {
                 delivery_id: newDelivery.id,
                 status_id: tempBody.status_id,
               },
-            }) as IDeliveryStatus;
-            
+            })) as IDeliveryStatus;
+
             return newDelivery.id;
           }
         };
 
-        const deliverysIds = await Promise.all(                    
+        const deliverysIds = await Promise.all(
           tempBody.order_delivery_id.map((id) => processOrderDelivery(id))
         );
 
@@ -191,11 +189,12 @@ export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
     } catch (error) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: {
-          try:true,
-          error
+          try: true,
+          error,
         },
         actionResult: false,
-      } as IResponseBase<any>);return
+      } as IResponseBase<any>);
+      return;
     }
   }
 }
@@ -324,18 +323,44 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
         }
       }
 
-      
-      const ordertts = await this.prisma.order_delivery.findMany({        
+
+      const ordertts = await this.prisma.order_delivery.findMany({
         where: whereCondition,
-        include:
-        
+        include: {
+          delivery: {
+            include: {
+              delivery_status: {
+                include: {
+                  status: { select: { id: true, name: true, createAt: true } },
+                },
+              },
+            },
+          },
+          client:{
+            select:{
+              name:true,              
+            }
+          },
+          address:true,
+          type_order:{
+            select:{id:true,name:true}
+          },
+          user:{
+            select:{name:true}
+          }
+        },
       });
-      
-      console.log('ordertts',ordertts);
+
+      const orders_result = ordertts.map((item) => ({order: { ...item }}));
+     
+      res.status(HttpStatus.OK).json({
+        data: orders_result,
+        actionResult: true,
+      } as IResponseBase<typeof orders_result>);
+      return;
+
       const orders = await this.prisma.view_order.findMany({
-        
         where: whereCondition,
-        
       });
 
       if (orders.length === 0) {
@@ -389,10 +414,10 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
           (s) => s.id === deliveryStatus?.status_id
         );
         const statusMap = new Map(statuses.map((s) => [s.id, s]));
-        console.log('statuses',statuses);
-        console.log('status',status);
-        console.log('statusMap',statusMap);
-        
+        console.log("statuses", statuses);
+        console.log("status", status);
+        console.log("statusMap", statusMap);
+
         const result: any = { order };
 
         if (delivery) {

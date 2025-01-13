@@ -5,7 +5,7 @@ dotenv.config();
 export class JwtUtil {
   private static JWT_SECRET = process.env.JWT;
 
-  public static GenerateToken(payload: object, expiresIn: string = "1d") {
+  public static GenerateToken(payload: object, expiresIn: string = "8h") {
     
     if (!this.JWT_SECRET) {
       throw new Error("JWT_SECRET não está definido");

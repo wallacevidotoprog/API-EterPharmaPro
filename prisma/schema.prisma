@@ -17,6 +17,12 @@ model address {
   uf           String   @db.VarChar(2)
   createAt     DateTime @default(now()) @db.DateTime(0)
   updateAt     DateTime @default(now()) @db.DateTime(0)
+
+  client_address client_address[]
+
+  store store[]
+
+  order_delivery order_delivery[]
 }
 
 model client {
@@ -27,6 +33,10 @@ model client {
   phone    String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
+
+  client_address client_address[]
+
+  order_delivery order_delivery[]
 }
 
 model client_address {
@@ -36,40 +46,48 @@ model client_address {
   createAt   DateTime @default(now()) @db.DateTime(0)
   updateAt   DateTime @default(now()) @db.DateTime(0)
 
-  @@unique([client_id, address_id], map: "unique_client_address")
+  //@@unique([client_id, address_id], map: "unique_client_address")
   @@index([address_id], map: "client_address_addrees_fk_idx")
+
+  address address? @relation(fields: [address_id],references: [id])
+  client client? @relation(fields: [client_id],references: [id])
+
 }
 
 model delivery {
   id                String    @id @default(uuid())
-  order_delivery_id String?
+  order_delivery_id String? @unique
   user_id           String?
   date              DateTime  @db.DateTime(0)
   motor_kilometers  Int
   createAt          DateTime  @default(now()) @db.DateTime(0)
   updateAt          DateTime  @default(now()) @db.DateTime(0)
 
-  delivery_status   delivery_status[]
+  
 
-  order_delivery order_delivery? @relation(fields: [order_delivery_id],references: [id])
 
   @@index([order_delivery_id], map: "delivery_order_delivery_id_fk_idx")
   @@index([user_id], map: "delivery_userid_fk,_idx")
+  
+  user users? @relation(fields: [user_id],references: [id])
+  
+  order_delivery order_delivery[]
+  delivery_status delivery_status[]
 }
 
 model delivery_status {
   id          String   @id @default(uuid())
-  delivery_id String?
-  status_id   String?
+  delivery_id String? @unique
+  status_id   String? @unique
   createAt    DateTime  @default(now()) @db.DateTime(0)
   updateAt    DateTime  @default(now()) @db.DateTime(0)
 
   
-  delivery delivery? @relation(fields: [delivery_id],references: [id])
-  status status? @relation(fields: [status_id],references: [id])
 
   @@index([delivery_id], map: "delivery_status_delivery_fk_idx")
   @@index([status_id], map: "delivery_status_status_id_fk_idx")
+  delivery delivery? @relation(fields: [delivery_id],references: [id])
+  status status? @relation(fields: [status_id],references: [id])
 }
 
 model maintenance_motor {
@@ -85,6 +103,9 @@ model maintenance_motor {
 
   @@index([motorcycle_id], map: "maintenance_motor_motorcycle_fk_idx")
   @@index([type_maintenance_id], map: "maintenance_motor_type_maintenance_fk_idx")
+
+  type_maintenance type_maintenance? @relation(fields: [type_maintenance_id],references: [id]) 
+  motorcycle motorcycle? @relation(fields: [motorcycle_id],references: [id])  
 }
 
 model motorcycle {
@@ -96,6 +117,9 @@ model motorcycle {
   updateAt DateTime @default(now()) @db.DateTime(0)
 
   @@index([store_id], map: "motorcycle_store_id_fk_idx")
+  maintenance_motor maintenance_motor[]
+
+  store type_maintenance? @relation(fields: [store_id],references: [id]) 
 }
 
 model order_delivery {
@@ -114,7 +138,14 @@ model order_delivery {
   @@index([client_id], map: "order_delivery_client_fk_idx")
   @@index([type_order_id], map: "order_delivery_type_order_fk_idx")
   @@index([user_id], map: "order_delivery_user_fk_idx")
-  delivery delivery[]
+  
+  
+  client client? @relation(fields: [client_id],references: [id])
+  address address? @relation(fields: [address_id],references: [id])
+  type_order type_order? @relation(fields: [type_order_id],references: [id])
+  user users? @relation(fields: [user_id],references: [id])
+
+  delivery delivery? @relation(fields: [id],references: [order_delivery_id])
 }
 
 model permissions {
@@ -145,8 +176,8 @@ model position_permissions {
 model status {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(50)
-  createAt DateTime @db.DateTime(0)
-  updateAt DateTime @db.DateTime(0)
+  createAt       DateTime @default(now()) @db.DateTime(0)
+  updateAt       DateTime @default(now()) @db.DateTime(0)
 
   delivery_status delivery_status[]
 }
@@ -163,6 +194,9 @@ model store {
   updateAt   DateTime @default(now()) @db.DateTime(0)
 
   @@index([address_id], map: "store_address_fk_idx")
+
+  address address? @relation(fields: [address_id],references: [id]) 
+  users users[]
 }
 
 model type_maintenance {
@@ -170,6 +204,10 @@ model type_maintenance {
   name     String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
+
+  maintenance_motor maintenance_motor[]
+
+  motorcycle motorcycle[]
 }
 
 model type_order {
@@ -177,6 +215,8 @@ model type_order {
   name     String   @db.VarChar(45)
   createAt DateTime @default(now()) @db.DateTime(0)
   updateAt DateTime @default(now()) @db.DateTime(0)
+
+  order_delivery order_delivery[]
 }
 
 model users {
@@ -193,6 +233,11 @@ model users {
 
   @@index([store_id], map: "user_store_id_fk_idx")
   @@index([position_id], map: "users_position_id_fk_idx")
+  delivery delivery[]
+
+  store store? @relation(fields: [store_id],references: [id]) 
+  //position po? @relation(fields: [position_id],references: [id]) 
+  order_delivery order_delivery[]
 }
 
 
