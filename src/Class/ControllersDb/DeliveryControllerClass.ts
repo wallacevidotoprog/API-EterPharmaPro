@@ -1,4 +1,3 @@
-import { address } from './../../../node_modules/.prisma/client/index.d';
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { Request, Response } from "express";
@@ -35,15 +34,6 @@ export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
     try {
       if (req.query.type && req.query.type === "full") {
         const tempBody: IDeliveryReq = req.body;
-        console.log(tempBody);
-
-        // if (!tempBody) {
-        //   res.status(HttpStatus.BAD_REQUEST).json({
-        //     message: "Faltou inserir o delivery e/ou status",
-        //     actionResult: false,
-        //   } as IResponseBase<string>);
-        //   return;
-        // }
 
         if (!tempBody || !tempBody.order_delivery_id || !tempBody.status_id) {
           res.status(HttpStatus.BAD_REQUEST).json({
@@ -75,7 +65,6 @@ export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
                 user_id: tempBody.user_id,
               } as IDelivery,
             });
-            console.log("newDelivery", newDelivery);
 
             (await this.prisma.delivery_status.create({
               data: {
@@ -96,93 +85,6 @@ export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
           data: deliverysIds,
           actionResult: true,
         } as IResponseBase<string[]>);
-
-        // if (tempBody.order_delivery_id) {
-        //   for (
-        //     let index = 0;
-        //     index < tempBody.order_delivery_id.length;
-        //     index++
-        //   ) {
-        //     const element = tempBody.order_delivery_id[index];
-
-        //     await this.prisma.delivery
-        //       .findFirst({
-        //         where: { order_delivery_id: element },
-        //       })
-        //       .then(async (data) => {
-        //         if (data) {
-        //           await this.prisma.delivery_status
-        //             .create({
-        //               data: {
-        //                 delivery_id: data.id,
-        //                 status_id: tempBody.status_id,
-        //               },
-        //             })
-        //             .then((data) => {
-        //               res.status(HttpStatus.CREATED).json({
-        //                 data: data.id,
-        //                 actionResult: true,
-        //               } as IResponseBase<string | null>);
-        //               return;
-        //             })
-        //             .catch((error) => {
-        //               res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        //                 data: error,
-        //                 actionResult: false,
-        //               } as IResponseBase<typeof error>);
-        //               return;
-        //             });
-        //         } else {
-        //           await this.prisma.delivery
-        //             .create({
-        //               data: {
-        //                 date: tempBody.date,
-        //                 motor_kilometers: tempBody.motor_kilometers,
-        //                 order_delivery_id: element,
-        //                 user_id: tempBody.user_id,
-        //               },
-        //             })
-        //             .then(async (date) => {
-        //               await this.prisma.delivery_status
-        //                 .create({
-        //                   data: {
-        //                     delivery_id: date.id,
-        //                     status_id: tempBody.status_id,
-        //                   },
-        //                 })
-        //                 .then((data) => {
-        //                   res.status(HttpStatus.CREATED).json({
-        //                     data: data.id,
-        //                     actionResult: true,
-        //                   } as IResponseBase<string | null>);
-        //                   return;
-        //                 })
-        //                 .catch((error) => {
-        //                   res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        //                     data: error,
-        //                     actionResult: false,
-        //                   } as IResponseBase<typeof error>);
-        //                   return;
-        //                 });
-        //             })
-        //             .catch((error) => {
-        //               res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        //                 data: error,
-        //                 actionResult: false,
-        //               } as IResponseBase<typeof error>);
-        //               return;
-        //             });
-        //         }
-        //       })
-        //       .catch((error) => {
-        //         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        //           data: error,
-        //           actionResult: false,
-        //         } as IResponseBase<typeof error>);
-        //         return;
-        //       });
-        //   }
-        // }
       } else {
         await super.CREATE(req, res);
       }
@@ -224,8 +126,8 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
 
         //CLIENTE
         const returnClient = await this.prisma.client.findFirst({
-          where: {
-            OR: [{ cpf: client.cpf }, { rg: client.rg }],
+          where: {cpf: client.cpf
+            // OR: [{ cpf: client.cpf }, { rg: client.rg }],
           },
         });
 
@@ -281,8 +183,6 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
             },
           });
         }
-
-        //order.date = new Date(order.date);
         req.body = order;
 
         await super.CREATE(req, res);
@@ -323,7 +223,6 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
         }
       }
 
-
       const ordertts = await this.prisma.order_delivery.findMany({
         where: whereCondition,
         include: {
@@ -336,23 +235,26 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
               },
             },
           },
-          client:{
-            select:{
-              name:true,              
-            }
+          client: {
+            select: {
+              name: true,
+              cpf: true,
+              rg: true,
+              phone: true,
+            },
           },
-          address:true,
-          type_order:{
-            select:{id:true,name:true}
+          address: true,
+          type_order: {
+            select: { id: true, name: true },
           },
-          user:{
-            select:{name:true}
-          }
+          user: {
+            select: { name: true },
+          },
         },
       });
 
-      const orders_result = ordertts.map((item) => ({order: { ...item }}));
-     
+      const orders_result = ordertts.map((item) => ({ order: { ...item } }));
+
       res.status(HttpStatus.OK).json({
         data: orders_result,
         actionResult: true,
