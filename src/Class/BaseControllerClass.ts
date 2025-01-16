@@ -89,8 +89,7 @@ export abstract class BaseControllerClass<T> {
     
     try {
       const entity: T = req.body as T;
-      console.log('const entity: T = req.body as T;', req.body);
-      
+     
       const model: any = this.prisma[this.nameTable];
 
       if (!model || !("create" in model)) {
@@ -98,7 +97,7 @@ export abstract class BaseControllerClass<T> {
           `Método 'create' não encontrado para o modelo ${this.nameTable.toString()}`
         );
       }
-      console.log('data: entity', entity);
+      
       
       const result = await model.create({ data: entity });
       res.status(HttpStatus.CREATED).json({

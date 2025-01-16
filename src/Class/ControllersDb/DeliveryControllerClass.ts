@@ -32,7 +32,7 @@ export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
 
   public async CREATE(req: Request, res: Response): Promise<void> {
     try {
-      if (req.query.type && req.query.type === "full") {
+      if (req.query.type && req.query.type === "colleted-all") {
         const tempBody: IDeliveryReq = req.body;
 
         if (!tempBody || !tempBody.order_delivery_id || !tempBody.status_id) {
@@ -48,33 +48,49 @@ export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
             where: { order_delivery_id: element },
           });
 
-          if (existingDelivery) {
-            await this.prisma.delivery_status.create({
-              data: {
-                delivery_id: existingDelivery.id,
-                status_id: tempBody.status_id,
-              },
-            });
-            return existingDelivery.id;
-          } else {
-            const newDelivery = await this.prisma.delivery.create({
-              data: {
-                date: tempBody.date,
-                motor_kilometers: tempBody.motor_kilometers,
-                order_delivery_id: element,
-                user_id: tempBody.user_id,
-              } as IDelivery,
-            });
+          if (
+            await this.prisma.order_delivery.findFirst({
+              where: { id: element },
+            })
+          ) {
+            if (existingDelivery) {
+              const new_delivery_status =
+                await this.prisma.delivery_status.create({
+                  data: {
+                    delivery_id: existingDelivery.id,
+                    status_id: tempBody.status_id,
+                  },
+                });
+              return `new_delivery_status:${new_delivery_status.id}`;
+            } else {
+              const newDelivery = await this.prisma.delivery.create({
+                data: {
+                  date: tempBody.date,
+                  motor_kilometers: tempBody.motor_kilometers,
+                  user_id: tempBody.user_id,
+                  order_delivery_id: element,
+                } as IDelivery,
+              });
 
-            (await this.prisma.delivery_status.create({
-              data: {
-                delivery_id: newDelivery.id,
-                status_id: tempBody.status_id,
-              },
-            })) as IDeliveryStatus;
+              if (newDelivery) {
+                (await this.prisma.delivery_status.create({
+                  data: {
+                    delivery_id: newDelivery.id,
+                    status_id: tempBody.status_id,
+                  },
+                })) as IDeliveryStatus;
 
-            return newDelivery.id;
+                return `newDelivery:${newDelivery.id}`;
+              }
+
+              return "ERRO CREATE: newDelivery & delivery_status";
+            }
           }
+          res.status(HttpStatus.BAD_REQUEST).json({
+            data: "Order not exist"+element,
+            actionResult: false,
+          } as IResponseBase<string>);
+          return "Order not exist"
         };
 
         const deliverysIds = await Promise.all(
@@ -112,7 +128,6 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
   }
 
   public async CREATE(req: Request, res: Response): Promise<void> {
-    console.log('req.body',req.body);
     if (req.query.type && req.query.type === "full") {
       try {
         const { order, client, address }: IOrderDeliveryFull = req.body;
@@ -127,7 +142,8 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
 
         //CLIENTE
         const returnClient = await this.prisma.client.findFirst({
-          where: {cpf: client.cpf
+          where: {
+            cpf: client.cpf,
             // OR: [{ cpf: client.cpf }, { rg: client.rg }],
           },
         });
@@ -185,7 +201,6 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
           });
         }
         req.body = order;
-        console.log(' req.body = order',req.body);
         await super.CREATE(req, res);
       } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -261,96 +276,6 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
         actionResult: true,
       } as IResponseBase<typeof orders_result>);
       return;
-
-      const orders = await this.prisma.view_order.findMany({
-        where: whereCondition,
-      });
-
-      if (orders.length === 0) {
-        res.status(HttpStatus.OK).json({
-          data: [],
-          actionResult: true,
-        } as IResponseBase<typeof orders>);
-        return;
-      }
-
-      const orderIds = orders
-        .map((order) => order.id)
-        .filter(Boolean) as string[];
-
-      const deliveries = await this.prisma.delivery.findMany({
-        where: { order_delivery_id: { in: orderIds } },
-      });
-
-      const deliveryIds = deliveries
-        .map((delivery) => delivery.id)
-        .filter(Boolean) as string[];
-
-      const deliveryStatuses = await this.prisma.delivery_status.findMany({
-        where: { delivery_id: { in: deliveryIds } },
-        select: {
-          id: true,
-          status_id: true,
-          createAt: true,
-          delivery_id: true,
-        },
-      });
-
-      const statusIds = deliveryStatuses
-        .map((status) => status.status_id)
-        .filter(Boolean) as string[];
-
-      const statuses = await this.prisma.status.findMany({
-        where: { id: { in: statusIds } },
-        select: { id: true, name: true },
-      });
-
-      const enrichedOrders = orders.map((order) => {
-        const delivery = deliveries.find(
-          (d) => d.order_delivery_id === order.id
-        );
-        const deliveryStatus = deliveryStatuses.find(
-          (ds) => ds.delivery_id === delivery?.id
-        );
-
-        const status = statuses.filter(
-          (s) => s.id === deliveryStatus?.status_id
-        );
-        const statusMap = new Map(statuses.map((s) => [s.id, s]));
-        console.log("statuses", statuses);
-        console.log("status", status);
-        console.log("statusMap", statusMap);
-
-        const result: any = { order };
-
-        if (delivery) {
-          result.delivery = delivery;
-        }
-
-        if (status.length > 0) {
-          //result.status = status;
-          result.status = deliveryStatuses
-            .map((deliveryStatus) => {
-              if (!deliveryStatus.status_id) return null;
-
-              const status = statusMap.get(deliveryStatus.status_id);
-              return status
-                ? {
-                    name: status.name,
-                    create: deliveryStatus.createAt,
-                  }
-                : null;
-            })
-            .filter(Boolean);
-        }
-
-        return result;
-      });
-
-      res.status(HttpStatus.OK).json({
-        data: enrichedOrders,
-        actionResult: true,
-      } as IResponseBase<typeof enrichedOrders>);
     } catch (error) {
       this.handleError(res, error);
     }
