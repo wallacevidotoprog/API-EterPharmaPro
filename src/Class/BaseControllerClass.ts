@@ -84,11 +84,13 @@ export abstract class BaseControllerClass<T> {
   }
 
   public async CREATE(req: Request, res: Response): Promise<void> {
+    
     if (!this.VallidateBody(req, res)) return;
-
+    
     try {
       const entity: T = req.body as T;
-
+      console.log('const entity: T = req.body as T;', req.body);
+      
       const model: any = this.prisma[this.nameTable];
 
       if (!model || !("create" in model)) {
@@ -96,20 +98,8 @@ export abstract class BaseControllerClass<T> {
           `Método 'create' não encontrado para o modelo ${this.nameTable.toString()}`
         );
       }
-
-     
-      // if (existingEntity) {
-      //   // Registro já existe, retorne um erro apropriado
-      //   res.status(HttpStatus.CONFLICT).json({
-      //     data: null,
-      //     actionResult: false,
-      //     message: "Registro já existe.",
-      //   } as IResponseBase<null>);
-      //   return;
-      // }
-
-
-
+      console.log('data: entity', entity);
+      
       const result = await model.create({ data: entity });
       res.status(HttpStatus.CREATED).json({
         data: result?.id,

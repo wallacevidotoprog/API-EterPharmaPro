@@ -112,6 +112,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
   }
 
   public async CREATE(req: Request, res: Response): Promise<void> {
+    console.log('req.body',req.body);
     if (req.query.type && req.query.type === "full") {
       try {
         const { order, client, address }: IOrderDeliveryFull = req.body;
@@ -184,7 +185,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
           });
         }
         req.body = order;
-
+        console.log(' req.body = order',req.body);
         await super.CREATE(req, res);
       } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

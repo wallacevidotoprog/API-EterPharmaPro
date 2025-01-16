@@ -7,8 +7,8 @@ CREATE TABLE `address` (
     `neighborhood` VARCHAR(45) NOT NULL,
     `city` VARCHAR(45) NOT NULL,
     `uf` VARCHAR(2) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -20,8 +20,8 @@ CREATE TABLE `client` (
     `rg` VARCHAR(45) NULL,
     `name` VARCHAR(45) NOT NULL,
     `phone` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `client_cpf_key`(`cpf`),
     UNIQUE INDEX `client_rg_key`(`rg`),
@@ -33,8 +33,8 @@ CREATE TABLE `client_address` (
     `id` VARCHAR(191) NOT NULL,
     `client_id` VARCHAR(191) NULL,
     `address_id` VARCHAR(191) NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `client_address_addrees_fk_idx`(`address_id`),
     PRIMARY KEY (`id`)
@@ -47,9 +47,10 @@ CREATE TABLE `delivery` (
     `user_id` VARCHAR(191) NULL,
     `date` DATETIME(0) NOT NULL,
     `motor_kilometers` INTEGER NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `delivery_order_delivery_id_key`(`order_delivery_id`),
     INDEX `delivery_order_delivery_id_fk_idx`(`order_delivery_id`),
     INDEX `delivery_userid_fk,_idx`(`user_id`),
     PRIMARY KEY (`id`)
@@ -60,9 +61,11 @@ CREATE TABLE `delivery_status` (
     `id` VARCHAR(191) NOT NULL,
     `delivery_id` VARCHAR(191) NULL,
     `status_id` VARCHAR(191) NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `delivery_status_delivery_id_key`(`delivery_id`),
+    UNIQUE INDEX `delivery_status_status_id_key`(`status_id`),
     INDEX `delivery_status_delivery_fk_idx`(`delivery_id`),
     INDEX `delivery_status_status_id_fk_idx`(`status_id`),
     PRIMARY KEY (`id`)
@@ -77,8 +80,8 @@ CREATE TABLE `maintenance_motor` (
     `value` DECIMAL(10, 2) NOT NULL,
     `location` VARCHAR(45) NULL,
     `photo_receipt` VARCHAR(45) NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `maintenance_motor_motorcycle_fk_idx`(`motorcycle_id`),
     INDEX `maintenance_motor_type_maintenance_fk_idx`(`type_maintenance_id`),
@@ -91,8 +94,8 @@ CREATE TABLE `motorcycle` (
     `store_id` VARCHAR(191) NULL,
     `model` VARCHAR(45) NOT NULL,
     `year` INTEGER NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `motorcycle_store_id_fk_idx`(`store_id`),
     PRIMARY KEY (`id`)
@@ -107,8 +110,8 @@ CREATE TABLE `order_delivery` (
     `address_id` VARCHAR(191) NULL,
     `type_order_id` VARCHAR(191) NULL,
     `value` DECIMAL(10, 2) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `obs` VARCHAR(191) NULL,
 
     INDEX `order_delivery_address_fk_idx`(`address_id`),
@@ -122,8 +125,8 @@ CREATE TABLE `order_delivery` (
 CREATE TABLE `permissions` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -132,8 +135,8 @@ CREATE TABLE `permissions` (
 CREATE TABLE `position` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -143,8 +146,8 @@ CREATE TABLE `position_permissions` (
     `id` VARCHAR(191) NOT NULL,
     `user_id` VARCHAR(191) NULL,
     `permissions_id` VARCHAR(191) NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `position_permissions_permissions_id_fk_idx`(`permissions_id`),
     INDEX `position_permissions_user_id_fk_idx`(`user_id`),
@@ -155,8 +158,8 @@ CREATE TABLE `position_permissions` (
 CREATE TABLE `status` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(50) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -170,8 +173,8 @@ CREATE TABLE `store` (
     `address_id` VARCHAR(191) NULL,
     `phone` VARCHAR(45) NOT NULL,
     `email` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `store_address_fk_idx`(`address_id`),
     PRIMARY KEY (`id`)
@@ -181,8 +184,8 @@ CREATE TABLE `store` (
 CREATE TABLE `type_maintenance` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -191,8 +194,8 @@ CREATE TABLE `type_maintenance` (
 CREATE TABLE `type_order` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -207,8 +210,8 @@ CREATE TABLE `users` (
     `name` VARCHAR(45) NOT NULL,
     `position_id` VARCHAR(191) NULL,
     `stats` BOOLEAN NOT NULL DEFAULT true,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updateAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `email_UNIQUE`(`email`),
     INDEX `user_store_id_fk_idx`(`store_id`),
@@ -234,23 +237,11 @@ CREATE TABLE `view_order` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
-CREATE TABLE `_clientToorder_delivery` (
-    `A` VARCHAR(191) NOT NULL,
-    `B` VARCHAR(191) NOT NULL,
-
-    UNIQUE INDEX `_clientToorder_delivery_AB_unique`(`A`, `B`),
-    INDEX `_clientToorder_delivery_B_index`(`B`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 -- AddForeignKey
 ALTER TABLE `client_address` ADD CONSTRAINT `client_address_address_id_fkey` FOREIGN KEY (`address_id`) REFERENCES `address`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `client_address` ADD CONSTRAINT `client_address_client_id_fkey` FOREIGN KEY (`client_id`) REFERENCES `client`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `delivery` ADD CONSTRAINT `delivery_order_delivery_id_fkey` FOREIGN KEY (`order_delivery_id`) REFERENCES `order_delivery`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `delivery` ADD CONSTRAINT `delivery_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -271,13 +262,22 @@ ALTER TABLE `maintenance_motor` ADD CONSTRAINT `maintenance_motor_motorcycle_id_
 ALTER TABLE `motorcycle` ADD CONSTRAINT `motorcycle_store_id_fkey` FOREIGN KEY (`store_id`) REFERENCES `type_maintenance`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `order_delivery` ADD CONSTRAINT `order_delivery_client_id_fkey` FOREIGN KEY (`client_id`) REFERENCES `client`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `order_delivery` ADD CONSTRAINT `order_delivery_address_id_fkey` FOREIGN KEY (`address_id`) REFERENCES `address`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `order_delivery` ADD CONSTRAINT `order_delivery_type_order_id_fkey` FOREIGN KEY (`type_order_id`) REFERENCES `type_order`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `order_delivery` ADD CONSTRAINT `order_delivery_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `order_delivery` ADD CONSTRAINT `order_delivery_id_fkey` FOREIGN KEY (`id`) REFERENCES `delivery`(`order_delivery_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `store` ADD CONSTRAINT `store_address_id_fkey` FOREIGN KEY (`address_id`) REFERENCES `address`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `users` ADD CONSTRAINT `users_store_id_fkey` FOREIGN KEY (`store_id`) REFERENCES `store`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `_clientToorder_delivery` ADD CONSTRAINT `_clientToorder_delivery_A_fkey` FOREIGN KEY (`A`) REFERENCES `client`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `_clientToorder_delivery` ADD CONSTRAINT `_clientToorder_delivery_B_fkey` FOREIGN KEY (`B`) REFERENCES `order_delivery`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

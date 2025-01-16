@@ -72,6 +72,10 @@ function getPool(): Pool {
       );
     });
     checkePrisma();
+
+
+    console.log('agora',Date());
+    
 })();
 
 process.on("SIGINT", async () => {
