@@ -60,19 +60,19 @@ routerUser.post("/login", async (req, res) => {
 
     const userTemp: IUsers = Array.isArray(rows) ? rows[0] : rows;
 
-    const isPasswordValid = await AuthService.CryptPassCompare(
-      objReq.pass,
-      userTemp.pass
-    );
-
-    if (!isPasswordValid) {
-      res.status(HttpStatus.UNAUTHORIZED).json({
-        message: "Credenciais inválidas.",
-        actionResult: false,
-      } as IResponseBase<null>);
-      return;
-    }
-
+    if (userTemp.pass) {
+      const isPasswordValid = await AuthService.CryptPassCompare(
+        objReq.pass,
+        userTemp.pass
+      );
+      if (!isPasswordValid) {
+        res.status(HttpStatus.UNAUTHORIZED).json({
+          message: "Credenciais inválidas.",
+          actionResult: false,
+        } as IResponseBase<null>);
+        return;
+      }
+    } 
     res.cookie("authToken", await AuthService.GenerateToken(userTemp), {
       httpOnly: true,
       secure: false,
@@ -108,7 +108,8 @@ routerUser.post("/signup", async (req, res) => {
     //objUser.position_id = 1;
     
     const validatedUser = zUsers.parse(objUser);
-    const result= await prisma.users.create({ data: datas });
+    // @ts-ignore
+    const result= await prisma.users.create({ data: validatedUser });
 
     
 
@@ -186,7 +187,7 @@ routerUser.put("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
     }
 
     const id: number = parseInt(req.params["id"]);
-
+// @ts-ignore
     dbQueryModel.UPDATE(users, { id: id }).then((ret) => {
       res.status(HttpStatus.OK).json({
         message: "Usuário atualizado com sucesso.",
@@ -213,7 +214,8 @@ routerUser.delete(
         } as IResponseBase<string>);
         return;
       }
-      const id: number = parseInt(req.params["id"]);
+      
+      const id: string = req.params["id"];
 
       await dbQueryModel
         .DELETE({ id: id })
@@ -249,7 +251,7 @@ routerUser.get("/users/:id", AuthMiddleware.Authenticate, async (req, res) => {
       } as IResponseBase<string>);
       return;
     }
-    const id: number = parseInt(req.params["id"]);
+    const id: string = req.params["id"];
 
     await dbQueryModel
       .GET({ id: id })

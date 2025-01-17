@@ -40,7 +40,7 @@ export class AuthMiddleware {
     }
   }
 
-  public static async CheckPermission(user_id: number) {
+  public static async CheckPermission(user_id: string) {
     const DbQuery = new OperationsDbClass<IUsers>("users");
     const [user, _]: any = await connection?.query(
       DbQuery.GET({ id: user_id })

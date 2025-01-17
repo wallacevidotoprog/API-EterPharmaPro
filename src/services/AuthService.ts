@@ -22,7 +22,7 @@ export class AuthService {
         id: obj.id,
         email: obj.email,
         name: obj.name,
-        permissions: await this.SetPermissions(obj.id) || [], //#Implementar
+        //permissions: await this.SetPermissions(obj.id) || [], //#Implementar
       };      
       return JwtUtil.GenerateToken({ jwtNew });
     } catch (error) {
@@ -62,6 +62,7 @@ export class AuthService {
     );
 
     const [user, _]: any = await connection?.query(
+      // @ts-ignore
       DbQueryUser.GET({ id: user_id })
     );
     const users: IUsers = user[0];
