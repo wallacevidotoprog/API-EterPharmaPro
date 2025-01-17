@@ -7,6 +7,9 @@ async function main() {
   await prisma.type_order.deleteMany({});
   await prisma.status.deleteMany({});
 
+  console.log('SEED INSERT');
+  
+
   // Inserir dados na tabela `status`
   await prisma.status.createMany({
     data: [
