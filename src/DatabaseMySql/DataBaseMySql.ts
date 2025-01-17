@@ -1,31 +1,40 @@
-import mysql, { Pool } from "mysql2/promise";
-import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
+import dotenv from "dotenv";
+import mysql, { Pool } from "mysql2/promise";
 
 dotenv.config();
 
 let isConnected: boolean = false;
 let connection: Pool | null = null;
-const prisma = new PrismaClient();
-
+ 
+const prisma = 
+  process.env.SSL === "true"
+    ? new PrismaClient({
+        datasources: {
+          db: {
+            url: `${process.env.DATABASE_URL}?sslaccept=strict&sslcert=${process.env.SSL_CA}`,
+          },
+        },
+      })
+    : new PrismaClient();
+ 
 async function connectToDatabase() {
   try {
-    connection = await mysql.createPool({
+    const db = {
       host: process.env.HOST,
       port: Number(process.env.PORT),
       user: process.env.USER,
       password: process.env.PASSWORD,
       database: process.env.DATABASE,
       waitForConnections: true,
-      //connectionLimit: 10, // Número máximo de conexões no pool
-      //queueLimit: 0, // Sem limite para a fila de conexões
-      ///ssl: {
-      ///   ca:process.env.DB_CA_CERT,
-      // ca: process.env.CA_CERT_PATH
-      //   ? require("fs").readFileSync(process.env.CA_CERT_PATH)
-      //   : undefined,
-      /// },
-    });
+      ...(process.env.SSL === "true" && {
+        ssl: {
+          ca: process.env.SSL_CA,
+        },
+      }),
+    }
+    
+    connection = await mysql.createPool(db);
   } catch (error) {
     isConnected = false;
     console.error("\x1b[33m[MYSQL]\x1b[36m❌ Erro ao criar createPool:", error);
@@ -71,11 +80,9 @@ function getPool(): Pool {
         error
       );
     });
-    checkePrisma();
+  checkePrisma();
 
-
-    console.log('agora',Date());
-    
+  console.log("agora", Date());
 })();
 
 process.on("SIGINT", async () => {
@@ -88,15 +95,21 @@ process.on("SIGINT", async () => {
 
 async function checkePrisma() {
   try {
-    const result = await prisma.client.findFirst({ where: { cpf: '00000000000' } });
+    const result = await prisma.client.findFirst({
+      where: { cpf: "00000000000" },
+    });
     if (result) {
-      console.log("\x1b[33m[PRISMA]\x1b[36m✅ Prisma ok",);      
+      console.log("\x1b[33m[PRISMA]\x1b[36m✅ Prisma ok");
     }
+    else{
+      console.log("\x1b[33m[PRISMA]\x1b[36m✅ Prisma Mais ou menos=>",prisma.users.findFirst({select:{name:true}}));
+      
+    }
+
   } catch (error) {
-    console.log("\x1b[33m[PRISMA]\x1b[36m❌ Prisma erro",error);
+    console.log("\x1b[33m[PRISMA]\x1b[36m❌ Prisma erro", error);
   } finally {
     await prisma.$disconnect();
-
   }
 }
-export { connection, isConnected };
+export { connection, isConnected, prisma };

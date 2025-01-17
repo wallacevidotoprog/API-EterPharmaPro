@@ -1,5 +1,5 @@
 node_modules
-dist
-.env
+*.env
 serviceAccountKey.json
 .vercel
+dist

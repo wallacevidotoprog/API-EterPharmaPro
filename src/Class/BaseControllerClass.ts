@@ -1,14 +1,14 @@
-import { client_address } from './../../node_modules/.prisma/client/index.d';
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { z, ZodError } from "zod";
 import { HttpStatus } from "../Enum/HttpStatus";
 import { IResponseBase } from "../Interface/IResponseBase";
-import { z, ZodError } from "zod";
+import {prisma} from '../DatabaseMySql/DataBaseMySql'
 
 export abstract class BaseControllerClass<T> {
-  protected prisma = new PrismaClient();
+  protected prisma = prisma;
 
-  private schema: z.ZodType<any>;  // Esquema Zod
+  private schema: z.ZodType<any>; // Esquema Zod
 
   constructor(schema: z.ZodType<any>) {
     this.schema = schema;
@@ -21,7 +21,11 @@ export abstract class BaseControllerClass<T> {
       return await this.schema.parseAsync(data); // Valida e transforma os dados
     } catch (error) {
       if (error instanceof ZodError) {
-        throw new Error(`Validation failed for ${this.nameTable.toString()}: ${JSON.stringify(error.errors)}`);
+        throw new Error(
+          `Validation failed for ${this.nameTable.toString()}: ${JSON.stringify(
+            error.errors
+          )}`
+        );
       }
       throw new Error("Unexpected error during validation");
     }
@@ -84,12 +88,11 @@ export abstract class BaseControllerClass<T> {
   }
 
   public async CREATE(req: Request, res: Response): Promise<void> {
-    
     if (!this.VallidateBody(req, res)) return;
-    
+
     try {
       const entity: T = req.body as T;
-     
+
       const model: any = this.prisma[this.nameTable];
 
       if (!model || !("create" in model)) {
@@ -97,8 +100,7 @@ export abstract class BaseControllerClass<T> {
           `Método 'create' não encontrado para o modelo ${this.nameTable.toString()}`
         );
       }
-      
-      
+
       const result = await model.create({ data: entity });
       res.status(HttpStatus.CREATED).json({
         data: result?.id,
@@ -134,8 +136,8 @@ export abstract class BaseControllerClass<T> {
         actionResult: true,
       } as IResponseBase<typeof result>);
     } catch (error) {
-    this.handleError(res, error);
-  }
+      this.handleError(res, error);
+    }
   }
 
   public async DELETE(req: Request, res: Response): Promise<void> {
@@ -156,13 +158,12 @@ export abstract class BaseControllerClass<T> {
         actionResult: true,
       } as IResponseBase<typeof result>);
     } catch (error) {
-    this.handleError(res, error);
-  }
+      this.handleError(res, error);
+    }
   }
 
   //arrumar ou excluir
   public async GET(req: Request, res: Response): Promise<void> {
-
     const id = this.ValidateParams(req, res, "id");
     try {
       const model: any = this.prisma[this.nameTable];
@@ -178,15 +179,15 @@ export abstract class BaseControllerClass<T> {
       //const whereCondition = this.buildWhereCondition(query);
 
       const result = await model.findFirst({
-       // where: whereCondition,
+        // where: whereCondition,
       });
       res.status(HttpStatus.OK).json({
         data: result,
         actionResult: true,
       } as IResponseBase<typeof result>);
     } catch (error) {
-    this.handleError(res, error);
-  }
+      this.handleError(res, error);
+    }
   }
 
   public async GETALL(req: Request, res: Response): Promise<void> {
@@ -197,23 +198,21 @@ export abstract class BaseControllerClass<T> {
         throw new Error(
           `Método 'findMany ' não encontrado para o modelo ${this.nameTable.toString()}`
         );
-      }     
-      
+      }
 
       const validatedData = await this.ValidateQueryZod(req.query);
 
-      const result = await model.findMany({ where:validatedData  });
-
+      const result = await model.findMany({ where: validatedData });
 
       res.status(HttpStatus.OK).json({
         data: result,
         actionResult: true,
       } as IResponseBase<typeof result>);
     } catch (error) {
-    this.handleError(res, error);
+      this.handleError(res, error);
+    }
   }
-  }
-  
+
   public async GETALLFULL(req: Request, res: Response): Promise<void> {
     try {
       const model: any = this.prisma[this.nameTable];
@@ -222,58 +221,62 @@ export abstract class BaseControllerClass<T> {
         throw new Error(
           `Método 'findMany ' não encontrado para o modelo ${this.nameTable.toString()}`
         );
-      }   
-      
-      const relationsMap: Record<string, any>  = {
-        client_address: {address:true,client:true}
+      }
+
+      const relationsMap: Record<string, any> = {
+        client_address: { address: true, client: true },
       };
-      
-      const includeRelations = relationsMap[this.nameTable as string] || undefined;
-      
+
+      const includeRelations =
+        relationsMap[this.nameTable as string] || undefined;
+
       const validatedData = await this.ValidateQueryZod(req.query);
 
-      const result = await model.findMany({ where:validatedData ,include: includeRelations});
-
+      const result = await model.findMany({
+        where: validatedData,
+        include: includeRelations,
+      });
 
       res.status(HttpStatus.OK).json({
         data: result,
         actionResult: true,
       } as IResponseBase<typeof result>);
     } catch (error) {
-    this.handleError(res, error);
-  }
+      this.handleError(res, error);
+    }
   }
   public async UPSERT(req: Request, res: Response): Promise<void> {
     //POST /users/upsert?uniqueKey=email&uniqueValue=test@example.com
     if (!this.VallidateBody(req, res)) return;
-  
+
     try {
       const entity: T = req.body as T;
-  
+
       const model: any = this.prisma[this.nameTable];
       if (!model || !("upsert" in model)) {
         throw new Error(
           `Método 'upsert' não encontrado para o modelo ${this.nameTable.toString()}`
         );
       }
-  
+
       const uniqueKey = req.query.uniqueKey as keyof T;
       const uniqueValue = req.query.uniqueValue;
-  
+
       if (!uniqueKey || !uniqueValue) {
         res.status(HttpStatus.BAD_REQUEST).json({
-          message: "É necessário informar a chave única e o valor para o upsert.",
+          message:
+            "É necessário informar a chave única e o valor para o upsert.",
           actionResult: false,
         } as IResponseBase<string>);
         return;
       }
-  
+
       const result = await model.upsert({
         where: { [uniqueKey]: uniqueValue }, // Condição de busca
         update: entity, // Dados para atualizar, se o registro existir
         create: entity, // Dados para criar, se o registro não existir
       });
-  
+
       res.status(HttpStatus.OK).json({
         data: result,
         actionResult: true,
