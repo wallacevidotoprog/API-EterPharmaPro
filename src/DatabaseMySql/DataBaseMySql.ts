@@ -22,7 +22,7 @@ async function connectToDatabase() {
   try {
     const db = {
       host: process.env.HOST,
-      port: Number(process.env.PORT),
+      port: Number(process.env.PORTSQL),
       user: process.env.USER,
       password: process.env.PASSWORD,
       database: process.env.DATABASE,
@@ -103,7 +103,7 @@ async function checkePrisma() {
       console.log("\x1b[33m[PRISMA]\x1b[36m✅ Prisma ok");
     }
     else{
-      console.log("\x1b[33m[PRISMA]\x1b[36m✅ Prisma Mais ou menos=>",prisma.users.findFirst({select:{name:true}}));
+      console.log("\x1b[33m[PRISMA]\x1b[36m✅ Prisma Mais ou menos=>",await prisma.users.findFirst({select:{name:true}}));
       
     }
 
