@@ -217,7 +217,7 @@ model type_order {
   updateAt DateTime @updatedAt @db.DateTime(0)
 
   order_delivery order_delivery[]
-}
+} 
 
 model users {
   id          String   @id @default(uuid())

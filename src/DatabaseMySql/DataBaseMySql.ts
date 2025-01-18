@@ -27,6 +27,7 @@ async function connectToDatabase() {
       password: process.env.PASSWORD,
       database: process.env.DATABASE,
       waitForConnections: true,
+      timeZone: 'Z',
       ...(process.env.SSL === "true" && {
         ssl: {
           ca: process.env.SSL_CA,

@@ -3,7 +3,8 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.users.deleteMany({});
+  try {
+    await prisma.users.deleteMany({});
   await prisma.type_order.deleteMany({});
   await prisma.status.deleteMany({});
 
@@ -47,6 +48,10 @@ async function main() {
       stats: true,
     },
   });
+  } catch (error) {
+    console.error('SEED',error)
+  }
+  
 }
 
 main()
