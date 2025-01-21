@@ -7,8 +7,8 @@ CREATE TABLE `address` (
     `neighborhood` VARCHAR(45) NOT NULL,
     `city` VARCHAR(45) NOT NULL,
     `uf` VARCHAR(2) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -20,8 +20,8 @@ CREATE TABLE `client` (
     `rg` VARCHAR(45) NULL,
     `name` VARCHAR(45) NOT NULL,
     `phone` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     UNIQUE INDEX `client_cpf_key`(`cpf`),
     UNIQUE INDEX `client_rg_key`(`rg`),
@@ -33,8 +33,8 @@ CREATE TABLE `client_address` (
     `id` VARCHAR(191) NOT NULL,
     `client_id` VARCHAR(191) NULL,
     `address_id` VARCHAR(191) NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     INDEX `client_address_addrees_fk_idx`(`address_id`),
     PRIMARY KEY (`id`)
@@ -44,13 +44,13 @@ CREATE TABLE `client_address` (
 CREATE TABLE `order_delivery` (
     `id` VARCHAR(191) NOT NULL,
     `user_id` VARCHAR(191) NULL,
-    `date` DATETIME(0) NOT NULL,
+    `date` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `client_id` VARCHAR(191) NULL,
     `address_id` VARCHAR(191) NULL,
     `type_order_id` VARCHAR(191) NULL,
     `value` DECIMAL(10, 2) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `obs` VARCHAR(191) NULL,
 
     INDEX `order_delivery_address_fk_idx`(`address_id`),
@@ -64,11 +64,11 @@ CREATE TABLE `order_delivery` (
 CREATE TABLE `delivery` (
     `id` VARCHAR(191) NOT NULL,
     `user_id` VARCHAR(191) NULL,
-    `date` DATETIME(0) NOT NULL,
+    `date` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `motor_kilometers` INTEGER NOT NULL,
     `order_delivery_id` VARCHAR(191) NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     UNIQUE INDEX `delivery_order_delivery_id_key`(`order_delivery_id`),
     INDEX `delivery_userid_fk,_idx`(`user_id`),
@@ -80,8 +80,8 @@ CREATE TABLE `delivery_status` (
     `id` VARCHAR(191) NOT NULL,
     `delivery_id` VARCHAR(191) NULL,
     `status_id` VARCHAR(191) NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     INDEX `delivery_status_delivery_fk_idx`(`delivery_id`),
     INDEX `delivery_status_status_id_fk_idx`(`status_id`),
@@ -92,8 +92,8 @@ CREATE TABLE `delivery_status` (
 CREATE TABLE `status` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(50) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -103,12 +103,12 @@ CREATE TABLE `maintenance_motor` (
     `id` VARCHAR(191) NOT NULL,
     `type_maintenance_id` VARCHAR(191) NULL,
     `motorcycle_id` VARCHAR(191) NULL,
-    `date` DATETIME(0) NOT NULL,
+    `date` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `value` DECIMAL(10, 2) NOT NULL,
     `location` VARCHAR(45) NULL,
     `photo_receipt` VARCHAR(45) NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     INDEX `maintenance_motor_motorcycle_fk_idx`(`motorcycle_id`),
     INDEX `maintenance_motor_type_maintenance_fk_idx`(`type_maintenance_id`),
@@ -121,8 +121,8 @@ CREATE TABLE `motorcycle` (
     `store_id` VARCHAR(191) NULL,
     `model` VARCHAR(45) NOT NULL,
     `year` INTEGER NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     INDEX `motorcycle_store_id_fk_idx`(`store_id`),
     PRIMARY KEY (`id`)
@@ -132,8 +132,8 @@ CREATE TABLE `motorcycle` (
 CREATE TABLE `permissions` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -142,8 +142,8 @@ CREATE TABLE `permissions` (
 CREATE TABLE `position` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -153,8 +153,8 @@ CREATE TABLE `position_permissions` (
     `id` VARCHAR(191) NOT NULL,
     `user_id` VARCHAR(191) NULL,
     `permissions_id` VARCHAR(191) NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     INDEX `position_permissions_permissions_id_fk_idx`(`permissions_id`),
     INDEX `position_permissions_user_id_fk_idx`(`user_id`),
@@ -170,8 +170,8 @@ CREATE TABLE `store` (
     `address_id` VARCHAR(191) NULL,
     `phone` VARCHAR(45) NOT NULL,
     `email` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     INDEX `store_address_fk_idx`(`address_id`),
     PRIMARY KEY (`id`)
@@ -181,8 +181,8 @@ CREATE TABLE `store` (
 CREATE TABLE `type_maintenance` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -191,8 +191,8 @@ CREATE TABLE `type_maintenance` (
 CREATE TABLE `type_order` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(45) NOT NULL,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -207,8 +207,8 @@ CREATE TABLE `users` (
     `name` VARCHAR(45) NOT NULL,
     `position_id` VARCHAR(191) NULL,
     `stats` BOOLEAN NOT NULL DEFAULT true,
-    `createAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updateAt` DATETIME(0) NOT NULL,
+    `createAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updateAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     UNIQUE INDEX `email_UNIQUE`(`email`),
     INDEX `user_store_id_fk_idx`(`store_id`),

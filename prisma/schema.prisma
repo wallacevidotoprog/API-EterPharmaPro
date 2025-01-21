@@ -16,8 +16,8 @@ model address {
   neighborhood String   @db.VarChar(45)
   city         String   @db.VarChar(45)
   uf           String   @db.VarChar(2)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   client_address client_address[]
 
@@ -32,8 +32,8 @@ model client {
   rg       String?  @unique @db.VarChar(45)
   name     String   @db.VarChar(45)
   phone    String   @db.VarChar(45)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   client_address client_address[]
 
@@ -44,8 +44,8 @@ model client_address {
   id         String   @id @default(uuid())
   client_id  String?
   address_id String?
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   //@@unique([client_id, address_id], map: "unique_client_address")
   @@index([address_id], map: "client_address_addrees_fk_idx")
@@ -57,14 +57,14 @@ model client_address {
 model order_delivery {
   id            String   @id @default(uuid())
   user_id       String?
-  date          DateTime @db.Timestamp()
+  date          DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
   client_id     String?
   address_id    String?
   type_order_id String?
   //delivery_id   String? @unique
   value         Decimal  @db.Decimal(10, 2)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
   obs           String?
 
   @@index([address_id], map: "order_delivery_address_fk_idx")
@@ -83,11 +83,11 @@ model order_delivery {
 model delivery {
   id                String    @id @default(uuid())
   user_id           String?
-  date              DateTime  @db.Timestamp()
+  date              DateTime  @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
   motor_kilometers  Int
   order_delivery_id    String? @unique
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
   
 
   @@index([user_id], map: "delivery_userid_fk,_idx")
@@ -102,8 +102,8 @@ model delivery_status {
   id          String   @id @default(uuid())
   delivery_id String? 
   status_id   String?
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
   
 
   @@index([delivery_id], map: "delivery_status_delivery_fk_idx")
@@ -115,8 +115,8 @@ model delivery_status {
 model status {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(50)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime  @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   delivery_status delivery_status[]
 
@@ -126,12 +126,12 @@ model maintenance_motor {
   id                  String   @id @default(uuid())
   type_maintenance_id String?
   motorcycle_id       String?
-  date                DateTime @db.Timestamp()
+  date                DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
   value               Decimal  @db.Decimal(10, 2)
   location            String?  @db.VarChar(45)
   photo_receipt       String?  @db.VarChar(45)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   @@index([motorcycle_id], map: "maintenance_motor_motorcycle_fk_idx")
   @@index([type_maintenance_id], map: "maintenance_motor_type_maintenance_fk_idx")
@@ -145,8 +145,8 @@ model motorcycle {
   store_id String?
   model    String   @db.VarChar(45)
   year     Int
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   @@index([store_id], map: "motorcycle_store_id_fk_idx")
   maintenance_motor maintenance_motor[]
@@ -159,23 +159,23 @@ model motorcycle {
 model permissions {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 }
 
 model position {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 }
 
 model position_permissions {
   id             String   @id @default(uuid())
   user_id        String?
   permissions_id String?
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   @@index([permissions_id], map: "position_permissions_permissions_id_fk_idx")
   @@index([user_id], map: "position_permissions_user_id_fk_idx")
@@ -191,8 +191,8 @@ model store {
   address_id String?
   phone      String   @db.VarChar(45)
   email      String   @db.VarChar(45)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   @@index([address_id], map: "store_address_fk_idx")
 
@@ -203,8 +203,8 @@ model store {
 model type_maintenance {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   maintenance_motor maintenance_motor[]
 
@@ -214,8 +214,8 @@ model type_maintenance {
 model type_order {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   order_delivery order_delivery[]
 } 
@@ -229,8 +229,8 @@ model users {
   name        String   @db.VarChar(45)
   position_id String?
   stats       Boolean  @default(true)
-  createAt DateTime @default(now()) @db.Timestamp()
-  updateAt DateTime @updatedAt
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 
   @@index([store_id], map: "user_store_id_fk_idx")
   @@index([position_id], map: "users_position_id_fk_idx")
