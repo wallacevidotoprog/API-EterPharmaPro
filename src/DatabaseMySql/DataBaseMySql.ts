@@ -27,7 +27,7 @@ async function connectToDatabase() {
       password: process.env.PASSWORD,
       database: process.env.DATABASE,
       waitForConnections: true,
-      timeZone: 'Z',
+      timeZone: '-03:00',
       ...(process.env.SSL === "true" && {
         ssl: {
           ca: process.env.SSL_CA,
@@ -83,7 +83,7 @@ function getPool(): Pool {
     });
   checkePrisma();
 
-  console.log("agora", Date());
+  console.log(Date());
 })();
 
 process.on("SIGINT", async () => {
@@ -96,9 +96,17 @@ process.on("SIGINT", async () => {
 
 async function checkePrisma() {
   try {
-    const result = await prisma.client.findFirst({
-      where: { cpf: "00000000000" },
-    });
+    // prisma.$use(async (params, next) => {
+    //   // Define o fuso horário UTC-3 para a sessão da conexão
+    //   await prisma.$executeRaw`SET time_zone = '-03:00';`;
+    //   console.log(params);
+      
+    //   return next(params);
+    // });
+    await prisma.$executeRaw`SET time_zone = '-03:00';`;
+    const result = await prisma.$executeRaw`SET time_zone = '-03:00';`;
+    console.log('result',result);
+    
     if (result) {
       console.log("\x1b[33m[PRISMA]\x1b[36m✅ Prisma ok");
     }

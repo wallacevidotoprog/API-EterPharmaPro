@@ -235,6 +235,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
                 lte: endOfDay,
               },
             };
+            
           }
         }
       }
