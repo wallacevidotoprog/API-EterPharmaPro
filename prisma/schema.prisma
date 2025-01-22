@@ -8,7 +8,7 @@ datasource db {
 
 }
 
-model address {
+model  address {
   id           String   @id @default(uuid())
   cep          String?  @db.VarChar(45)
   place        String   @db.VarChar(45)
@@ -26,7 +26,7 @@ model address {
   order_delivery order_delivery[]
 }
 
-model client {
+model  client {
   id       String   @id @default(uuid())
   cpf      String?  @unique @db.VarChar(45)
   rg       String?  @unique @db.VarChar(45)
@@ -40,7 +40,7 @@ model client {
   order_delivery order_delivery[]
 }
 
-model client_address {
+model  client_address {
   id         String   @id @default(uuid())
   client_id  String?
   address_id String?
@@ -54,7 +54,7 @@ model client_address {
   client client? @relation(fields: [client_id],references: [id])
 
 }
-model order_delivery {
+model  order_delivery {
   id            String   @id @default(uuid())
   user_id       String?
   date          DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
@@ -80,7 +80,7 @@ model order_delivery {
   delivery delivery?
   //delivery delivery? @relation(fields: [delivery_id],references: [id])
 }
-model delivery {
+model  delivery {
   id                String    @id @default(uuid())
   user_id           String?
   date              DateTime  @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
@@ -98,7 +98,7 @@ model delivery {
   delivery_status delivery_status[]
 }
 
-model delivery_status {
+model  delivery_status {
   id          String   @id @default(uuid())
   delivery_id String? 
   status_id   String?
@@ -112,7 +112,7 @@ model delivery_status {
   delivery delivery? @relation(fields: [delivery_id],references: [id])
   status status? @relation(fields: [status_id],references: [id])
 }
-model status {
+model  status {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(50)
   createAt DateTime  @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
@@ -122,7 +122,7 @@ model status {
 
   @@map("status")
 }
-model maintenance_motor {
+model  maintenance_motor {
   id                  String   @id @default(uuid())
   type_maintenance_id String?
   motorcycle_id       String?
@@ -140,10 +140,10 @@ model maintenance_motor {
   motorcycle motorcycle? @relation(fields: [motorcycle_id],references: [id])  
 }
 
-model motorcycle {
+model  motorcycle {
   id       String   @id @default(uuid())
   store_id String?
-  model    String   @db.VarChar(45)
+  model     String   @db.VarChar(45)
   year     Int
   createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
   updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
@@ -156,21 +156,21 @@ model motorcycle {
 
 
 
-model permissions {
+model  permissions {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
   updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 }
 
-model position {
+model  position {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
   updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
 }
 
-model position_permissions {
+model  position_permissions {
   id             String   @id @default(uuid())
   user_id        String?
   permissions_id String?
@@ -183,7 +183,7 @@ model position_permissions {
 
 
 
-model store {
+model  store {
   id         String   @id @default(uuid())
   filial     String   @db.VarChar(10)
   cnpj       String   @db.VarChar(20)
@@ -200,7 +200,7 @@ model store {
   users users[]
 }
 
-model type_maintenance {
+model  type_maintenance {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
@@ -211,7 +211,7 @@ model type_maintenance {
   motorcycle motorcycle[]
 }
 
-model type_order {
+model  type_order {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(45)
   createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(0)
@@ -220,7 +220,7 @@ model type_order {
   order_delivery order_delivery[]
 } 
 
-model users {
+model  users {
   id          String   @id @default(uuid())
   store_id    String?
   email       String   @unique(map: "email_UNIQUE") @db.VarChar(45)
