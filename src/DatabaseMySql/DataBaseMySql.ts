@@ -68,6 +68,8 @@ function getPool(): Pool {
       //     );
       //   });
       const [rows] = await pool.query("SELECT NOW()");
+      console.log('rows',rows);
+      
       const serverTime = new Date((rows as any)[0]["NOW()"]);
       console.log(
         "\x1b[33m[MYSQL-Command]\x1b[36mHora do servidor:",
@@ -96,16 +98,11 @@ process.on("SIGINT", async () => {
 
 async function checkePrisma() {
   try {
-    // prisma.$use(async (params, next) => {
-    //   // Define o fuso horário UTC-3 para a sessão da conexão
-    //   await prisma.$executeRaw`SET time_zone = '-03:00';`;
-    //   console.log(params);
-      
-    //   return next(params);
-    // });
-    await prisma.$executeRaw`SET time_zone = '-03:00';`;
+    
     const result = await prisma.$executeRaw`SET time_zone = '-03:00';`;
+    const result2 = await prisma.$executeRaw`SET time_zone = '-03:00';`;
     console.log('result',result);
+    console.log('result2',result2);
     
     if (result) {
       console.log("\x1b[33m[PRISMA]\x1b[36m✅ Prisma ok");

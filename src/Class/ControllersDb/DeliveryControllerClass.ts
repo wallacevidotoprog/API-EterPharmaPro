@@ -270,6 +270,9 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
         },
       });
 
+      
+      
+      console.log('orders_result',ordertts);
       const orders_result = ordertts.map((item) => ({ order: { ...item } }));
 
       res.status(HttpStatus.OK).json({
