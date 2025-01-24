@@ -67,9 +67,7 @@ function getPool(): Pool {
       //       error.sqlMessage
       //     );
       //   });
-      const [rows] = await pool.query("SELECT NOW()");
-      console.log('rows',rows);
-      
+      const [rows] = await pool.query("SELECT NOW()");      
       const serverTime = new Date((rows as any)[0]["NOW()"]);
       console.log(
         "\x1b[33m[MYSQL-Command]\x1b[36mHora do servidor:",
@@ -83,7 +81,7 @@ function getPool(): Pool {
         error
       );
     });
-  checkePrisma();
+  await checkePrisma();
 
   console.log(Date());
 })();
@@ -99,11 +97,7 @@ process.on("SIGINT", async () => {
 async function checkePrisma() {
   try {
     
-    const result = await prisma.$executeRaw`SET time_zone = '-03:00';`;
-    const result2 = await prisma.$executeRaw`SET time_zone = '-03:00';`;
-    console.log('result',result);
-    console.log('result2',result2);
-    
+    const result = await prisma.$executeRaw`SET time_zone = '-03:00';`;    
     if (result) {
       console.log("\x1b[33m[PRISMA]\x1b[36m✅ Prisma ok");
     }

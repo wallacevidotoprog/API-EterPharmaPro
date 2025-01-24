@@ -50,7 +50,7 @@ export class AppServer {
       res.sendFile(path.join(process.cwd(), "/public", "index.html"));
     });
   }
-
+  
   public StartServer(): void {
     this.server?.listen(process.env.PORT_SERVER || 3000, () => {
       console.log(
