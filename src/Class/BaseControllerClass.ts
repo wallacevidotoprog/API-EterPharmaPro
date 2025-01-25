@@ -4,6 +4,7 @@ import { z, ZodError } from "zod";
 import { HttpStatus } from "../Enum/HttpStatus";
 import { IResponseBase } from "../Interface/IResponseBase";
 import {prisma} from '../DatabaseMySql/DataBaseMySql'
+import { Logger } from "../logger/logger";
 
 export abstract class BaseControllerClass<T> {
   protected prisma = prisma;
@@ -286,7 +287,7 @@ export abstract class BaseControllerClass<T> {
     }
   }
   protected handleError(res: Response, error: unknown): void {
-    console.error(error);
+    Logger.log('error','BaseControllerClass',error);
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       data: error,
       actionResult: false,

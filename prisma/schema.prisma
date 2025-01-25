@@ -8,29 +8,28 @@ datasource db {
 
 }
 
+//CLIENTE E AFINS
 model  address {
   id           String   @id @default(uuid())
   cep          String?  @db.VarChar(45)
-  place        String   @db.VarChar(45)
+  place        String   @db.VarChar(100)
   number       String   @db.VarChar(45)
-  neighborhood String   @db.VarChar(45)
-  city         String   @db.VarChar(45)
+  neighborhood String   @db.VarChar(80)
+  city         String   @db.VarChar(50)
   uf           String   @db.VarChar(2)
   createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
   updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
 
   client_address client_address[]
-
   store store[]
-
   order_delivery order_delivery[]
 }
 
 model  client {
   id       String   @id @default(uuid())
   cpf      String?  @unique @db.VarChar(45)
-  rg       String?  @unique @db.VarChar(45)
-  name     String   @db.VarChar(45)
+  c_interno       String?  @unique @db.VarChar(45)
+  name     String   @db.VarChar(50)
   phone    String   @db.VarChar(45)
   createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
   updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
@@ -47,13 +46,15 @@ model  client_address {
   createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
   updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
 
-  //@@unique([client_id, address_id], map: "unique_client_address")
   @@index([address_id], map: "client_address_addrees_fk_idx")
 
   address address? @relation(fields: [address_id],references: [id])
   client client? @relation(fields: [client_id],references: [id])
 
 }
+
+
+// DELIVERY
 model  order_delivery {
   id            String   @id @default(uuid())
   user_id       String?
@@ -61,7 +62,6 @@ model  order_delivery {
   client_id     String?
   address_id    String?
   type_order_id String?
-  //delivery_id   String? @unique
   value         Decimal  @db.Decimal(10, 2)
   createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
   updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
@@ -78,8 +78,8 @@ model  order_delivery {
   type_order type_order? @relation(fields: [type_order_id],references: [id])
   user users? @relation(fields: [user_id],references: [id])
   delivery delivery?
-  //delivery delivery? @relation(fields: [delivery_id],references: [id])
 }
+
 model  delivery {
   id                String    @id @default(uuid())
   user_id           String?
@@ -94,7 +94,6 @@ model  delivery {
   
   user users? @relation(fields: [user_id],references: [id])
   order_delivery order_delivery? @relation(fields: [order_delivery_id],references: [id])
-  //order_delivery order_delivery?
   delivery_status delivery_status[]
 }
 
@@ -112,6 +111,7 @@ model  delivery_status {
   delivery delivery? @relation(fields: [delivery_id],references: [id])
   status status? @relation(fields: [status_id],references: [id])
 }
+
 model  status {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(50)
@@ -122,6 +122,85 @@ model  status {
 
   @@map("status")
 }
+
+model  type_order {
+  id       String   @id @default(uuid())
+  name     String   @db.VarChar(45)
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
+
+  order_delivery order_delivery[]
+} 
+
+//USUARIOS
+model  store {
+  id         String   @id @default(uuid())
+  filial     String   @db.VarChar(10)
+  cnpj       String   @db.VarChar(20)
+  name       String   @db.VarChar(100)
+  address_id String?
+  phone      String   @db.VarChar(45)
+  email      String   @db.VarChar(45)
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
+
+  @@index([address_id], map: "store_address_fk_idx")
+
+  address address? @relation(fields: [address_id],references: [id]) 
+  users users[]
+  motorcycle motorcycle[]
+}
+
+model  users {
+  id          String   @id @default(uuid())
+  store_id    String?
+  email       String   @unique(map: "email_UNIQUE") @db.VarChar(45)
+  phone       String   @db.VarChar(45)
+  pass        String   @db.VarChar(60)
+  name        String   @db.VarChar(45)
+  position_id String?
+  stats       Boolean  @default(true)
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.DateTime()
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
+
+  @@index([store_id], map: "user_store_id_fk_idx")
+  @@index([position_id], map: "users_position_id_fk_idx")
+
+
+  delivery delivery[]
+  order_delivery order_delivery[]
+  store store? @relation(fields: [store_id],references: [id]) 
+  position position? @relation(fields: [position_id],references: [id]) 
+}
+
+model  position {
+  id       String   @id @default(uuid())
+  name     String   @db.VarChar(45)
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
+
+  users users[]
+}
+
+model  permissions {
+  id       String   @id @default(uuid())
+  name     String   @db.VarChar(45)
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
+}
+
+model  position_permissions {
+  id             String   @id @default(uuid())
+  user_id        String?
+  permissions_id String?
+  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
+  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
+
+  @@index([permissions_id], map: "position_permissions_permissions_id_fk_idx")
+  @@index([user_id], map: "position_permissions_user_id_fk_idx")
+}
+
+//MANUTENÇOES
 model  maintenance_motor {
   id                  String   @id @default(uuid())
   type_maintenance_id String?
@@ -145,59 +224,15 @@ model  motorcycle {
   store_id String?
   model     String   @db.VarChar(45)
   year     Int
+  renavan  String?
+  plate String?
   createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
   updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
 
   @@index([store_id], map: "motorcycle_store_id_fk_idx")
+
+  store store? @relation(fields: [store_id],references: [id]) 
   maintenance_motor maintenance_motor[]
-
-  store type_maintenance? @relation(fields: [store_id],references: [id]) 
-}
-
-
-
-model  permissions {
-  id       String   @id @default(uuid())
-  name     String   @db.VarChar(45)
-  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
-  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
-}
-
-model  position {
-  id       String   @id @default(uuid())
-  name     String   @db.VarChar(45)
-  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
-  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
-}
-
-model  position_permissions {
-  id             String   @id @default(uuid())
-  user_id        String?
-  permissions_id String?
-  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
-  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
-
-  @@index([permissions_id], map: "position_permissions_permissions_id_fk_idx")
-  @@index([user_id], map: "position_permissions_user_id_fk_idx")
-}
-
-
-
-model  store {
-  id         String   @id @default(uuid())
-  filial     String   @db.VarChar(10)
-  cnpj       String   @db.VarChar(20)
-  name       String   @db.VarChar(100)
-  address_id String?
-  phone      String   @db.VarChar(45)
-  email      String   @db.VarChar(45)
-  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
-  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
-
-  @@index([address_id], map: "store_address_fk_idx")
-
-  address address? @relation(fields: [address_id],references: [id]) 
-  users users[]
 }
 
 model  type_maintenance {
@@ -208,35 +243,8 @@ model  type_maintenance {
 
   maintenance_motor maintenance_motor[]
 
-  motorcycle motorcycle[]
 }
 
-model  type_order {
-  id       String   @id @default(uuid())
-  name     String   @db.VarChar(45)
-  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) 
-  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
 
-  order_delivery order_delivery[]
-} 
 
-model  users {
-  id          String   @id @default(uuid())
-  store_id    String?
-  email       String   @unique(map: "email_UNIQUE") @db.VarChar(45)
-  phone       String   @db.VarChar(45)
-  pass        String   @db.VarChar(60)
-  name        String   @db.VarChar(45)
-  position_id String?
-  stats       Boolean  @default(true)
-  createAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.DateTime()
-  updateAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")) 
 
-  @@index([store_id], map: "user_store_id_fk_idx")
-  @@index([position_id], map: "users_position_id_fk_idx")
-  delivery delivery[]
-
-  store store? @relation(fields: [store_id],references: [id]) 
-  //position po? @relation(fields: [position_id],references: [id]) 
-  order_delivery order_delivery[]
-}

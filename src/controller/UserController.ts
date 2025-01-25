@@ -35,5 +35,6 @@ routerUser.put('/users/:id', AuthMiddleware.Authenticate, modelController.UPDATE
 routerUser.delete('/users/:id', AuthMiddleware.Authenticate, modelController.DELETE.bind(modelController));
 
 routerUser.get('/users', AuthMiddleware.Authenticate, modelController.GETALLFULL.bind(modelController));
+routerUser.get('/users-default', AuthMiddleware.Authenticate, modelController.GetAllUserDefault.bind(modelController));
 
 export default routerUser;

@@ -1,0 +1,78 @@
+[LOG]-[2025-01-25T16:24:21.409Z]
+C:\Users\walla\source\API-EterPharmaPro\src\utils\JwtUtil.ts:22:14
+JDW 
+{
+  "jwtNew": {
+    "id": "900c3c93-cc38-4a55-aca3-b20e3881c015",
+    "email": "wallacevidoto@gmail.com",
+    "name": "Wallace Vidoto"
+  },
+  "iat": 1737821222,
+  "exp": 1737850022
+}
+
+[LOG]-[2025-01-25T16:24:21.443Z]
+C:\Users\walla\source\API-EterPharmaPro\src\utils\JwtUtil.ts:22:14
+JDW 
+{
+  "jwtNew": {
+    "id": "900c3c93-cc38-4a55-aca3-b20e3881c015",
+    "email": "wallacevidoto@gmail.com",
+    "name": "Wallace Vidoto"
+  },
+  "iat": 1737821222,
+  "exp": 1737850022
+}
+
+[LOG]-[2025-01-25T16:24:21.454Z]
+C:\Users\walla\source\API-EterPharmaPro\src\utils\JwtUtil.ts:22:14
+JDW 
+{
+  "jwtNew": {
+    "id": "900c3c93-cc38-4a55-aca3-b20e3881c015",
+    "email": "wallacevidoto@gmail.com",
+    "name": "Wallace Vidoto"
+  },
+  "iat": 1737821222,
+  "exp": 1737850022
+}
+
+[LOG]-[2025-01-25T16:24:21.467Z]
+C:\Users\walla\source\API-EterPharmaPro\src\utils\JwtUtil.ts:22:14
+JDW 
+{
+  "jwtNew": {
+    "id": "900c3c93-cc38-4a55-aca3-b20e3881c015",
+    "email": "wallacevidoto@gmail.com",
+    "name": "Wallace Vidoto"
+  },
+  "iat": 1737821222,
+  "exp": 1737850022
+}
+
+[LOG]-[2025-01-25T16:24:21.461Z]
+C:\Users\walla\source\API-EterPharmaPro\src\utils\JwtUtil.ts:22:14
+JDW 
+{
+  "jwtNew": {
+    "id": "900c3c93-cc38-4a55-aca3-b20e3881c015",
+    "email": "wallacevidoto@gmail.com",
+    "name": "Wallace Vidoto"
+  },
+  "iat": 1737821222,
+  "exp": 1737850022
+}
+
+[LOG]-[2025-01-25T16:24:21.477Z]
+C:\Users\walla\source\API-EterPharmaPro\src\utils\JwtUtil.ts:22:14
+JDW 
+{
+  "jwtNew": {
+    "id": "900c3c93-cc38-4a55-aca3-b20e3881c015",
+    "email": "wallacevidoto@gmail.com",
+    "name": "Wallace Vidoto"
+  },
+  "iat": 1737821222,
+  "exp": 1737850022
+}
+
