@@ -38,8 +38,7 @@ async function main() {
   // Inserir dados na tabela `users`
   await prisma.users.create({
     data: {
-      id: '900c3c93-cc38-4a55-aca3-b20e3881c015',
-      
+      id: '900c3c93-cc38-4a55-aca3-b20e3881c015',      
       email: 'wallacevidoto@gmail.com',
       phone: '17991983774',
       pass: '$2a$10$SOuNAXdWMFvzAg70ylJ2oOwAdvyMZscrfL47WdqDRPcSjvjpxmnDu',

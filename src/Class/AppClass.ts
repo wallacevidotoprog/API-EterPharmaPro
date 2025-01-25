@@ -52,12 +52,21 @@ export class AppServer {
   }
   
   public StartServer(): void {
-    this.server?.listen(process.env.PORT_SERVER || 3000, () => {
-      console.log(
-        `\x1b[33m[SERVER]✅\x1b[36m Server na porta ${
-          process.env.PORT_SERVER
-        }: ${process.env.SERVER}:${process.env.PORT_SERVER || 3000}/api \x1b[0m`
-      );
+    const host = process.env.SERVER || '0.0.0.0'; 
+    const port = process.env.PORT_SERVER || 3000; 
+  
+    // @ts-ignore
+    this.server?.listen(port, host, () => {
+      console.log(`\x1b[33m[SERVER]✅\x1b[36m Server running on http://${host}:${port}`);
     });
   }
+  // public StartServer(): void {
+  //   this.server?.listen(process.env.PORT_SERVER || 3000, () => {
+  //     console.log(
+  //       `\x1b[33m[SERVER]✅\x1b[36m Server na porta ${
+  //         process.env.PORT_SERVER
+  //       }: ${process.env.SERVER}:${process.env.PORT_SERVER || 3000}/api \x1b[0m`
+  //     );
+  //   });
+  // }
 }

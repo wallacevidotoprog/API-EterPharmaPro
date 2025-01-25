@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { JwtUtil } from "../utils/JwtUtil";
-import { connection } from "../DatabaseMySql/DataBaseMySql";
 import { OperationsDbClass } from "../Class/OperationsDbClass";
 import { IUsers } from "../Interface/db/IUsers";
 import { IResponseBase } from "../Interface/IResponseBase";
@@ -41,10 +40,10 @@ export class AuthMiddleware {
   }
 
   public static async CheckPermission(user_id: string) {
-    const DbQuery = new OperationsDbClass<IUsers>("users");
-    const [user, _]: any = await connection?.query(
-      DbQuery.GET({ id: user_id })
-    );
-    const users: IUsers = user[0];
+    // const DbQuery = new OperationsDbClass<IUsers>("users");
+    // const [user, _]: any = await connection?.query(
+    //   DbQuery.GET({ id: user_id })
+    // );
+    // const users: IUsers = user[0];
   }
 }

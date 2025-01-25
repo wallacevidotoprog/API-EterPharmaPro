@@ -8,6 +8,7 @@ export interface IOrderDelivery extends IBaseDataBase{
     address_id?: string ;
     type_order_id?: string ;
     value: number;
+    obs:string
 }
 
 export const zOrderDelivery = zBaseDatabase.extend({
@@ -24,4 +25,5 @@ export const zOrderDelivery = zBaseDatabase.extend({
     address_id: z.string().optional(),
     type_order_id: z.string().optional(),
     value: z.number().optional(),
+    obs: z.string().optional(),
 });

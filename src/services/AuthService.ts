@@ -2,7 +2,6 @@ import bcrypt from "bcryptjs";
 import { JwtUtil } from "../utils/JwtUtil";
 import { IUsers } from "../Interface/db/IUsers";
 import { OperationsDbClass } from "../Class/OperationsDbClass";
-import { connection } from "../DatabaseMySql/DataBaseMySql";
 import { IPermissions } from "../Interface/db/IPermissions";
 import { IPositionPermissions } from "../Interface/db/IPositionPermissions";
 import { IPermissionsUser } from "../Interface/IPermissionsUser";
@@ -50,48 +49,48 @@ export class AuthService {
     }
   }
 
-  private static async SetPermissions(
-    user_id?: number
-  ): Promise<IPermissionsUser| any> {
-    const DbQueryUser = new OperationsDbClass<IUsers>("users");
-    const DbQueryPermission = new OperationsDbClass<IPermissions>(
-      "permissions"
-    );
-    const DbQueryPermissions = new OperationsDbClass<IPositionPermissions>(
-      "position_permissions"
-    );
+  // private static async SetPermissions(
+  //   user_id?: number
+  // ): Promise<IPermissionsUser| any> {
+  //   const DbQueryUser = new OperationsDbClass<IUsers>("users");
+  //   const DbQueryPermission = new OperationsDbClass<IPermissions>(
+  //     "permissions"
+  //   );
+  //   const DbQueryPermissions = new OperationsDbClass<IPositionPermissions>(
+  //     "position_permissions"
+  //   );
 
-    const [user, _]: any = await connection?.query(
-      // @ts-ignore
-      DbQueryUser.GET({ id: user_id })
-    );
-    const users: IUsers = user[0];
+  //   const [user, _]: any = await connection?.query(
+  //     // @ts-ignore
+  //     DbQueryUser.GET({ id: user_id })
+  //   );
+  //   const users: IUsers = user[0];
 
-    if (users != null) {
-      const [_permissions, _]: any = await connection?.query(
-        DbQueryPermissions.GET({ user_id: users.id })
-      );
+  //   if (users != null) {
+  //     const [_permissions, _]: any = await connection?.query(
+  //       DbQueryPermissions.GET({ user_id: users.id })
+  //     );
 
-      const _positionPermissions: IPositionPermissions[] = _permissions;
+  //     const _positionPermissions: IPositionPermissions[] = _permissions;
 
-      if (_positionPermissions != null && _positionPermissions.length > 0) {
+  //     if (_positionPermissions != null && _positionPermissions.length > 0) {
 
-        let temp : IPermissionsUser={
-          permissions:[]
-        };
+  //       let temp : IPermissionsUser={
+  //         permissions:[]
+  //       };
 
-        for (let index = 0; index < _positionPermissions.length; index++) {
-          const element = _positionPermissions[index];
-          const [_permissions, _]: any = await connection?.query(
-            DbQueryPermission.GET({ id: element.permissions_id })
-          );
-          const permissions: IPermissions = user[0];
+  //       for (let index = 0; index < _positionPermissions.length; index++) {
+  //         const element = _positionPermissions[index];
+  //         const [_permissions, _]: any = await connection?.query(
+  //           DbQueryPermission.GET({ id: element.permissions_id })
+  //         );
+  //         const permissions: IPermissions = user[0];
 
-          temp.permissions.push(permissions)
-        }
+  //         temp.permissions.push(permissions)
+  //       }
 
-       return temp
-      }
-    }
-  }
+  //      return temp
+  //     }
+  //   }
+  // }
 }
