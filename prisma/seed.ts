@@ -76,7 +76,7 @@ async function main() {
           id: '93e32301-409e-4592-aa71-70d3fe7f5694',
           email: 'gabriel@gmail.com',
           phone: '17991983774',
-          pass: '$2a$10$SOuNAXdWMFvzAg70ylJ2oOwAdvyMZscrfL47WdqDRPcSjvjpxmnDu',
+          pass: '$2a$10$SOuNAXdWMFvzAg70ylJ2oOwAdvyMZscrfL47WdqDRPcSjvjpxmnDu', // Senha já criptografada
           name: 'Gabriel',
           position_id: '36f4e9cd-d7e4-4b27-9f6f-8df0eaacb133',
           stats: true,
@@ -144,6 +144,7 @@ async function main() {
         },
       ],
     });
+    
 
     console.log('SEED INSERT');
   } catch (error) {
