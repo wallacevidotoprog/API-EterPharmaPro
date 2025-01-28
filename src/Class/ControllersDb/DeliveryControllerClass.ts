@@ -121,8 +121,8 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
         //CLIENTE
         const returnClient = await this.prisma.client.findFirst({
           where: {
-            cpf: client.cpf,
-            // OR: [{ cpf: client.cpf }, { rg: client.rg }],
+            //cpf: client.cpf,
+             OR: [{ cpf: client.cpf }, { c_interno: client.c_interno }],
           },
         });
 

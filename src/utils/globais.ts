@@ -13,3 +13,9 @@ export function omitFields<T, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> 
   });
   return newObj;
 }
+
+export function getBrasiliaTime(): string {
+  const currentDate = new Date();
+  const utcDate = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000);
+  return utcDate.toISOString();
+}
