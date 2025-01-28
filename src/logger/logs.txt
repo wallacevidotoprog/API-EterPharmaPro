@@ -6,3 +6,35 @@ BaseControllerClass
   "clientVersion": "6.2.1"
 }
 
+[ERROR]-[2025-01-28T16:38:52.713Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientInitializationError",
+  "clientVersion": "6.2.1"
+}
+
+[ERROR]-[2025-01-28T16:39:13.196Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientInitializationError",
+  "clientVersion": "6.2.1"
+}
+
+[ERROR]-[2025-01-28T16:39:18.154Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientInitializationError",
+  "clientVersion": "6.2.1"
+}
+
+[ERROR]-[2025-01-28T23:09:44.404Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientValidationError",
+  "clientVersion": "6.2.1"
+}
+

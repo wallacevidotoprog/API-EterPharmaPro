@@ -12,7 +12,6 @@ import { ITypeOrder, zTypeOrder } from '../../Interface/db/ITypeOrder';
 import { IDeliveryReq } from '../../Interface/IDeliveryReq';
 import { IOrderDeliveryFull } from '../../Interface/IOrderDeliveryFull';
 import { IResponseBase } from '../../Interface/IResponseBase';
-import { Logger } from '../../logger/logger';
 import { BaseControllerClass } from '../BaseControllerClass';
 
 export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
@@ -122,7 +121,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
         const returnClient = await this.prisma.client.findFirst({
           where: {
             //cpf: client.cpf,
-             OR: [{ cpf: client.cpf }, { c_interno: client.c_interno }],
+            OR: [{ cpf: client.cpf }, { c_interno: client.c_interno }],
           },
         });
 
@@ -192,6 +191,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
 
       if (req.query) {
         const { date } = req.query;
+        const { de, ate } = req.query;
         if (date) {
           if (typeof date === 'string') {
             const selectedDate = new Date(date.split('T')[0]);
@@ -208,9 +208,31 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
               },
             };
           }
+        } else if (de && ate) {
+          // @ts-ignore
+          const startOfDay = new Date(de);
+          startOfDay.setUTCHours(0, 0, 0, 0);
+
+          // @ts-ignore
+          const endOfDay = new Date(ate);
+          endOfDay.setUTCHours(23, 59, 59, 999);
+          whereCondition = {
+            date: {
+              gte: startOfDay,
+              lte: endOfDay,
+            },
+          };
         }
       }
 
+      if (Object.keys(whereCondition).length === 0) {
+        
+        res.status(HttpStatus.BAD_REQUEST).json({
+          message: 'Faltou buscar = >'+whereCondition,
+          actionResult: false,
+        } as IResponseBase<string>);
+        return
+      }
       const ordertts = await this.prisma.order_delivery.findMany({
         where: whereCondition,
         include: {
@@ -220,6 +242,9 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
                 include: {
                   status: { select: { id: true, name: true, createAt: true } },
                 },
+              },
+              user: {
+                select: { name: true },
               },
             },
           },
@@ -240,7 +265,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
           },
         },
       });
-      
+
       const orders_result = ordertts.map((item) => ({ order: { ...item } }));
 
       res.status(HttpStatus.OK).json({
