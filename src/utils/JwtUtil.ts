@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Logger } from "../logger/logger";
+import { getBrasiliaTime } from './globais'
 dotenv.config();
 
 export class JwtUtil {
@@ -11,7 +12,13 @@ export class JwtUtil {
     if (!this.JWT_SECRET) {
       throw new Error("JWT_SECRET não está definido");
     }
-    return jwt.sign(payload, this.JWT_SECRET, { expiresIn: 28800 });
+    const brasilTime = getBrasiliaTime();
+    const tk = jwt.sign(payload, this.JWT_SECRET, { expiresIn: 8 * 60 * 60 });
+    // @ts-ignore
+    console.log(new Date(jwt.decode(tk)?.exp * 1000));
+    console.log('brasilTime',brasilTime);
+    
+    return tk;
   }
 
   public static  VerifyToken(token: string) {

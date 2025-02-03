@@ -38,3 +38,17 @@ BaseControllerClass
   "clientVersion": "6.2.1"
 }
 
+[ERROR]-[2025-02-03T23:00:59.009Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientKnownRequestError",
+  "code": "P1001",
+  "clientVersion": "6.2.1",
+  "meta": {
+    "modelName": "users",
+    "database_host": "18.230.62.19",
+    "database_port": 3306
+  }
+}
+
