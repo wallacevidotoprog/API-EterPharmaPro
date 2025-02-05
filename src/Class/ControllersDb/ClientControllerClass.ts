@@ -1,21 +1,14 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-import { DefaultArgs } from "@prisma/client/runtime/library";
-import { Request, Response } from "express";
-import { HttpStatus } from "../../Enum/HttpStatus";
-import {
-  IClientAddress,
-  zClientAddress,
-} from "../../Interface/db/IClientAddress";
-import { IClients, zClients } from "../../Interface/db/IClients";
-import { IResponseBase } from "../../Interface/IResponseBase";
-import { BaseControllerClass } from "../BaseControllerClass";
+import { Prisma, PrismaClient } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library';
+import { Request, Response } from 'express';
+import { HttpStatus } from '../../Enum/HttpStatus';
+import { IClientAddress, zClientAddress } from '../../Interface/db/IClientAddress';
+import { IClients, zClients } from '../../Interface/db/IClients';
+import { IResponseBase } from '../../Interface/IResponseBase';
+import { BaseControllerClass } from '../BaseControllerClass';
 
 export class ClientControllerClass extends BaseControllerClass<IClients> {
-  protected nameTable: keyof PrismaClient<
-    Prisma.PrismaClientOptions,
-    never,
-    DefaultArgs
-  > = "client";
+  protected nameTable: keyof PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs> = 'client';
 
   constructor() {
     super(zClients);
@@ -23,18 +16,29 @@ export class ClientControllerClass extends BaseControllerClass<IClients> {
 
   public async qGET(req: Request, res: Response): Promise<void> {
     try {
-      const { type, cod } = req.query as { type?: string; cod?: string };
+      
 
-      if (!cod || !type || !["rg", "cpf"].includes(type)) {
+      const { cpf, c_interno } = req.query as { cpf?: string; c_interno?: string };
+
+      if (!cpf && !c_interno) {
         res.status(HttpStatus.BAD_REQUEST).json({
           message: `Parâmetro '${req.query}' é inválido`,
           actionResult: false,
         } as IResponseBase<string>);
         return;
       }
-      const whereClause = type === "rg" ? { rg: cod } : { cpf: cod };
-
-      const result = await this.prisma.client.findFirst({ where: whereClause });
+ 
+      
+     
+      const whereClause = c_interno ? { c_interno: c_interno } : { cpf: cpf };
+      
+      const result = await this.prisma.client.findFirst  ({
+        where: whereClause,        
+        select: { cpf:true,c_interno:true,id:true,phone:true,name:true,  client_address: { select: { address: true } } },
+      });
+     
+      console.log('result',result);
+      
 
       if (!result) {
         res.status(HttpStatus.NOT_FOUND).json({
@@ -60,11 +64,7 @@ export class ClientControllerClass extends BaseControllerClass<IClients> {
 }
 
 export class ClientAddressControllerClass extends BaseControllerClass<IClientAddress> {
-  protected nameTable: keyof PrismaClient<
-    Prisma.PrismaClientOptions,
-    never,
-    DefaultArgs
-  > = "client_address";
+  protected nameTable: keyof PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs> = 'client_address';
   constructor() {
     super(zClientAddress);
   }

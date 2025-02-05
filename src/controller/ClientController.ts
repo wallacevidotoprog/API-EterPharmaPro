@@ -13,7 +13,8 @@ routerClient.put("/client/:id", AuthMiddleware.Authenticate ,  modelControllerCl
 
 routerClient.delete("/client/:id", AuthMiddleware.Authenticate ,  modelControllerCliente.DELETE.bind(modelControllerCliente));
 
-routerClient.get("/client", AuthMiddleware.Authenticate ,  modelControllerCliente.GETALL.bind(modelControllerCliente));
+routerClient.get("/client", AuthMiddleware.Authenticate ,  modelControllerCliente.qGET.bind(modelControllerCliente));
+
 routerClient.get("/client-all", AuthMiddleware.Authenticate ,  modelControllerCliente.GETALLFULL.bind(modelControllerCliente));
 
 //----- address

@@ -51,7 +51,7 @@ export class UsersControllerClass extends BaseControllerClass<IUsers> {
         httpOnly: true,
         secure: false,
         path: '/',
-        maxAge: 3600000,
+        maxAge: 8 * 60 * 60 * 1000,
       });
       res.status(HttpStatus.OK).json({
         message: 'Login bem-sucedido.',

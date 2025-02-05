@@ -143,7 +143,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
         //ENDEREÇO
         const returnAddres = await this.prisma.address.findFirst({
           where: {
-            OR: [{ cep: address.cep }, { number: address.number }],
+            AND: [{ cep: address.cep }, { number: address.number }],
           },
         });
         if (returnAddres) {
