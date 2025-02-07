@@ -1,0 +1,103 @@
+{
+  "configVersion": 1,
+  "timestamp": 1738895859606,
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/chunk-2IKZXLTV.js",
+        "/chunk-HMVGUYC2.js",
+        "/favicon.ico",
+        "/index.html",
+        "/main-UZZIK6ZS.js",
+        "/manifest.webmanifest",
+        "/polyfills-RT5I6R6G.js",
+        "/styles-U3T3CM2A.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/assets/delivery/cancelled.png",
+        "/assets/delivery/collected.png",
+        "/assets/delivery/finalized.png",
+        "/assets/delivery/init.png",
+        "/assets/delivery/route.png",
+        "/assets/icons/icon-128x128.png",
+        "/assets/icons/icon-144x144.png",
+        "/assets/icons/icon-152x152.png",
+        "/assets/icons/icon-192x192.png",
+        "/assets/icons/icon-384x384.png",
+        "/assets/icons/icon-512x512.png",
+        "/assets/icons/icon-72x72.png",
+        "/assets/icons/icon-96x96.png",
+        "/assets/images/maps-icon.png",
+        "/assets/images/user_default.jpg",
+        "/assets/images/whatsapp-icon.png",
+        "/assets/img_page/delivery_man.png",
+        "/assets/img_page/new_delivery.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/assets/delivery/cancelled.png": "a57d95c0dbb5ee6b86976c75ff40f7b2bc6d1766",
+    "/assets/delivery/collected.png": "e67ca85637b6b8b7a34df71dc2c1a9c93e25fa57",
+    "/assets/delivery/finalized.png": "757759d1a6f1d32442682404d5ed9365070bd38d",
+    "/assets/delivery/init.png": "e22722493684c22148184376b5910a44a4ca6d12",
+    "/assets/delivery/route.png": "a33a74de91c9b10d208a15b357afba31d6946525",
+    "/assets/icons/icon-128x128.png": "f912963bdc6d5a38d8f1dd0afbaab2ce8d657acb",
+    "/assets/icons/icon-144x144.png": "b155fd5f2fd5d2ea7760721063003c4cd95fd783",
+    "/assets/icons/icon-152x152.png": "eae6e0f0c8afb8aaae339e2a569b43e9238e5e6c",
+    "/assets/icons/icon-192x192.png": "15c4180454633880d98674aa7394656196c91584",
+    "/assets/icons/icon-384x384.png": "94a915751ef6c9282df9aea405ad679230631814",
+    "/assets/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
+    "/assets/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
+    "/assets/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
+    "/assets/images/maps-icon.png": "a981818bc273398c2afef206de4c596ce6fad784",
+    "/assets/images/user_default.jpg": "857650dc7768c8613249919ab34689845850a960",
+    "/assets/images/whatsapp-icon.png": "d42caf34850c3887821bff37a545ebd24ced13c6",
+    "/assets/img_page/delivery_man.png": "6a9e92142b0e1244f19405ece8e94cfbe06ab716",
+    "/assets/img_page/new_delivery.png": "11143ac11353583f37f9cec79f1b98b6520e60fb",
+    "/chunk-2IKZXLTV.js": "1d63c0d6d79ee3e9f7df431023cc35ac9c33d27d",
+    "/chunk-HMVGUYC2.js": "7b598819b9fe2bcfd6ca4019e803d8ddb0f8b602",
+    "/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
+    "/index.html": "48507be4659758fda030ed60012d1921f328c04d",
+    "/main-UZZIK6ZS.js": "6794aee0942bd1083929f17f907fd9436adbcbf3",
+    "/manifest.webmanifest": "e5270782232d876eda6284514fe30de5baa332b3",
+    "/polyfills-RT5I6R6G.js": "fe9f024576f21ff6314cf8f8332cde58b9a12416",
+    "/styles-U3T3CM2A.css": "8bd80bc290dcdefda9a686dddbdeee36f341c108"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}

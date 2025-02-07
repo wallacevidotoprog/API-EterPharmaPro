@@ -13,6 +13,9 @@ import { IDeliveryReq } from '../../Interface/IDeliveryReq';
 import { IOrderDeliveryFull } from '../../Interface/IOrderDeliveryFull';
 import { IResponseBase } from '../../Interface/IResponseBase';
 import { BaseControllerClass } from '../BaseControllerClass';
+import { IResponseDelivery } from '../../Interface/IResponseDelivery';
+import { websocketService } from '../../services/WebSocketInstance';
+import { TypesReciverWebSocketEnum } from '../../Enum/TypesReciverWebSocketEnum';
 
 export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
   protected nameTable: keyof PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs> = 'delivery';
@@ -175,6 +178,10 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
           });
         }
         req.body = order;
+
+        const data: IResponseDelivery = req.body;
+        websocketService.sendNotification(TypesReciverWebSocketEnum.Message, "Nova mensagem!", data);
+
         await super.CREATE(req, res);
       } catch (error) {
         this.handleError(res, error);
