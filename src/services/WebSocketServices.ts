@@ -165,6 +165,8 @@ export class WebSocketService {
   private wss: WebSocketServer | undefined;
 
   public initialize(server: Server): void {
+    console.log('server ws',server.address);
+    
     this.wss = new WebSocketServer({ server, path: "/socket" });
     this.wss.on("connection", (ws: WebSocket, request: Request) => {    
       this.handleConnection(ws);
