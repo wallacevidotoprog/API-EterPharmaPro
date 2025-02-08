@@ -1,5 +1,5 @@
 import express, { Application } from "express";
-//import { InitializerWebSocker } from "../services/WebSocketServices";
+
 import { createServer, Server } from "http";
 import path from "path";
 import dotenv from "dotenv";
@@ -8,9 +8,13 @@ import bodyParser from "body-parser";
 import { isConnected } from "../DatabaseMySql/DataBaseMySql";
 import cors from "cors";
 import { websocketService } from "../services/WebSocketInstance";
-//import { WebSocketService } from "../services/WebSocketServices";
 dotenv.config();
-
+const fs = require('fs');
+const options = {
+      cert: fs.readFileSync('/home/ubuntu/server/certificate.crt'),
+      key: fs.readFileSync('/home/ubuntu/server/private.key'),
+      ca: fs.readFileSync('/home/ubuntu/server/ca_bundle.crt') 
+    };
 export class AppServer {
   private app: Application;
   //private websocketService: WebSocketService;
@@ -18,7 +22,6 @@ export class AppServer {
 
   constructor() {
     this.app = express();
-    //this.websocketService = new WebSocketService();
     this.config();
     this.RouterDefault();    
     this.websocket();
@@ -40,10 +43,9 @@ export class AppServer {
   }
 
   private websocket(): void {
+    
     this.server = createServer(this.app);
     websocketService.initialize(this.server);
-    // this.server = createServer(this.app);
-    // InitializerWebSocker(this.server);
   }
   private RouterDefault(): void {
     this.app.get("/api/connected", (req, res) => {
