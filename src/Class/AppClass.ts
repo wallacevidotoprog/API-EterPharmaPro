@@ -1,26 +1,16 @@
-import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import express, { Application } from 'express';
+import fs from 'fs';
+import { createServer as createHTTPServer, Server } from 'http';
+import { createServer as createHTTPSServer } from 'https';
+import os from 'os';
 import path from 'path';
 import { isConnected } from '../DatabaseMySql/DataBaseMySql';
 import { websocketService } from '../services/WebSocketInstance';
-import fs from 'fs';
-import os from "os";
-import { createServer, Server } from 'http';
 dotenv.config();
-
-// if (process.env.PRODUCT === 'true') {
-  
-// import { createServer, Server } from 'https';
-// }
-// else{
-// import { createServer, Server } from 'http';
-// }
-
-
-
 //const fs = require('fs');
 
 export class AppServer {
@@ -32,7 +22,7 @@ export class AppServer {
     this.config();
     this.RouterDefault();
     this.StartHTTPSorHTTP();
-    this.websocket();
+    //this.websocket();
   }
   private config(): void {
     this.app.use(
@@ -50,14 +40,36 @@ export class AppServer {
     this.app.use('/api', require('../routers/index'));
   }
 
-  private StartHTTPSorHTTP():void{    
-    // const options = {
-    //   key: fs.readFileSync('/etc/letsencrypt/live/etersystem.ddns.net/privkey.pem'),
-    //   cert: fs.readFileSync('/etc/letsencrypt/live/etersystem.ddns.net/fullchain.pem'),
-    // };
-    // this.server = createServer(options,this.app);
-    this.server = createServer(this.app);
+  private StartHTTPSorHTTP(): void {
+    const env = process.env.NODE_ENV || 'development';
+
+    if (env === 'production') {
+      try {
+        const options = {
+          key: fs.readFileSync('/etc/letsencrypt/live/etersystem.ddns.net/privkey.pem'),
+          cert: fs.readFileSync('/etc/letsencrypt/live/etersystem.ddns.net/fullchain.pem'),
+        };
+        this.server = createHTTPSServer(options, this.app);
+        console.log('\x1b[33m[HTTPS]\x1b[36m ✅ HTTPS server is running in production mode\x1b[0m');
+      } catch (error) {
+        console.error('\x1b[31m[HTTPS]\x1b[36m ❌ Error loading SSL certificates:\x1b[0m', error);
+        console.log('\x1b[33m[FALLBACK]\x1b[36m ⚠️  Starting HTTP server instead\x1b[0m');
+        this.server = createHTTPServer(this.app);
+      }
+    } else {
+      this.server = createHTTPServer(this.app);
+      console.log('\x1b[34m[HTTP]🚀 HTTP server is running in development mode\x1b[0m');
+    }
   }
+
+  // private StartHTTPSorHTTP():void{
+  //   // const options = {
+  //   //   key: fs.readFileSync('/etc/letsencrypt/live/etersystem.ddns.net/privkey.pem'),
+  //   //   cert: fs.readFileSync('/etc/letsencrypt/live/etersystem.ddns.net/fullchain.pem'),
+  //   // };
+  //   // this.server = createServer(options,this.app);
+  //   this.server = createServer(this.app);
+  // }
   private websocket(): void {
     if (!this.server) return;
     websocketService.initialize(this.server);
@@ -77,28 +89,24 @@ export class AppServer {
   public StartServer(): void {
     const host = process.env.SERVER || '0.0.0.0';
     const port = process.env.PORT_SERVER || 3000;
-   
 
-    
     // @ts-ignore
     this.server?.listen(port, host, () => {
       console.log(`\x1b[33m[SERVER]✅\x1b[36m Server running on http://${this.getLocalIP()}:${port}`);
     });
   }
 
-
-
-private getLocalIP(): string {
-  const interfaces = os.networkInterfaces();
-  for (const iface of Object.values(interfaces)) {
-    if (iface) {
-      for (const details of iface) {
-        if (details.family === "IPv4" && !details.internal) {
-          return details.address;
+  private getLocalIP(): string {
+    const interfaces = os.networkInterfaces();
+    for (const iface of Object.values(interfaces)) {
+      if (iface) {
+        for (const details of iface) {
+          if (details.family === 'IPv4' && !details.internal) {
+            return details.address;
+          }
         }
       }
     }
+    return 'localhost';
   }
-  return "localhost"; 
-}
 }
