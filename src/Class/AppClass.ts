@@ -22,7 +22,7 @@ export class AppServer {
     this.config();
     this.RouterDefault();
     this.StartHTTPSorHTTP();
-    //this.websocket();
+    this.websocket();
   }
   private config(): void {
     this.app.use(
@@ -52,7 +52,7 @@ export class AppServer {
         this.server = createHTTPSServer(options, this.app);
         console.log('\x1b[33m[HTTPS]\x1b[36m ✅ HTTPS server is running in production mode\x1b[0m');
       } catch (error) {
-        console.error('\x1b[31m[HTTPS]\x1b[36m ❌ Error loading SSL certificates:\x1b[0m', error);
+        console.error('\x1b[33m[HTTPS]\x1b[36m ❌ Error loading SSL certificates:\x1b[0m', error);
         console.log('\x1b[33m[FALLBACK]\x1b[36m ⚠️  Starting HTTP server instead\x1b[0m');
         this.server = createHTTPServer(this.app);
       }
@@ -62,14 +62,6 @@ export class AppServer {
     }
   }
 
-  // private StartHTTPSorHTTP():void{
-  //   // const options = {
-  //   //   key: fs.readFileSync('/etc/letsencrypt/live/etersystem.ddns.net/privkey.pem'),
-  //   //   cert: fs.readFileSync('/etc/letsencrypt/live/etersystem.ddns.net/fullchain.pem'),
-  //   // };
-  //   // this.server = createServer(options,this.app);
-  //   this.server = createServer(this.app);
-  // }
   private websocket(): void {
     if (!this.server) return;
     websocketService.initialize(this.server);

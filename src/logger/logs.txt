@@ -1,0 +1,94 @@
+[ERROR]-[2025-02-12T01:23:11.657Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "issues": [
+    {
+      "code": "invalid_type",
+      "expected": "date",
+      "received": "undefined",
+      "path": [
+        "date"
+      ],
+      "message": "Required"
+    }
+  ],
+  "name": "ZodError"
+}
+
+[ERROR]-[2025-02-12T01:23:45.379Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "issues": [
+    {
+      "code": "invalid_type",
+      "expected": "number",
+      "received": "string",
+      "path": [
+        "value"
+      ],
+      "message": "Expected number, received string"
+    }
+  ],
+  "name": "ZodError"
+}
+
+[ERROR]-[2025-02-12T01:24:06.036Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "issues": [
+    {
+      "code": "invalid_type",
+      "expected": "number",
+      "received": "string",
+      "path": [
+        "value"
+      ],
+      "message": "Expected number, received string"
+    }
+  ],
+  "name": "ZodError"
+}
+
+[ERROR]-[2025-02-12T01:24:43.484Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientValidationError",
+  "clientVersion": "6.2.1"
+}
+
+[ERROR]-[2025-02-12T01:27:03.920Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientValidationError",
+  "clientVersion": "6.2.1"
+}
+
+[ERROR]-[2025-02-12T01:27:23.705Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientValidationError",
+  "clientVersion": "6.2.1"
+}
+
+[ERROR]-[2025-02-12T01:35:05.124Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientValidationError",
+  "clientVersion": "6.2.1"
+}
+
+[ERROR]-[2025-02-12T01:35:13.745Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientValidationError",
+  "clientVersion": "6.2.1"
+}
+

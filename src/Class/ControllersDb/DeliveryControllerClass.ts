@@ -2,6 +2,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { Request, Response } from 'express';
 import { HttpStatus } from '../../Enum/HttpStatus';
+import { TypesReciverWebSocketEnum } from '../../Enum/TypesReciverWebSocketEnum';
 import { zAddress } from '../../Interface/db/IAddress';
 import { zClients } from '../../Interface/db/IClients';
 import { IDelivery, zDelivery } from '../../Interface/db/IDelivery';
@@ -12,10 +13,10 @@ import { ITypeOrder, zTypeOrder } from '../../Interface/db/ITypeOrder';
 import { IDeliveryReq } from '../../Interface/IDeliveryReq';
 import { IOrderDeliveryFull } from '../../Interface/IOrderDeliveryFull';
 import { IResponseBase } from '../../Interface/IResponseBase';
-import { BaseControllerClass } from '../BaseControllerClass';
 import { IResponseDelivery } from '../../Interface/IResponseDelivery';
 import { websocketService } from '../../services/WebSocketInstance';
-import { TypesReciverWebSocketEnum } from '../../Enum/TypesReciverWebSocketEnum';
+import { BaseControllerClass } from '../BaseControllerClass';
+import { log } from 'node:console';
 
 export class DeliveryControllerClass extends BaseControllerClass<IDelivery> {
   protected nameTable: keyof PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs> = 'delivery';
@@ -142,7 +143,8 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
             order.client_id = returnClient.id;
           }
         }
-
+        console.log(client);
+        
         //ENDEREÇO
         const returnAddres = await this.prisma.address.findFirst({
           where: {
@@ -177,12 +179,28 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
             },
           });
         }
-        req.body = order;
 
-        const data: IResponseDelivery = req.body;
-        websocketService.sendNotification(TypesReciverWebSocketEnum.Message, "Nova mensagem!", data);
+        if (order.id) {
 
-        await super.CREATE(req, res);
+          const returnOrderRet = await this.prisma.order_delivery.upsert({
+            where:{ id: order.id },
+            create:{...order},
+            update:{...order}
+          });
+          res.status(HttpStatus.CREATED).json({
+            data:returnOrderRet,
+            actionResult: true,
+          } as IResponseBase<any>);
+          return;
+          
+        } else {
+          req.body = order;
+
+          const data: IResponseDelivery = req.body;
+          websocketService.sendNotification(TypesReciverWebSocketEnum.Message, 'Nova Entrega!', data);
+
+          await super.CREATE(req, res);
+        }
       } catch (error) {
         this.handleError(res, error);
         return;
@@ -233,12 +251,11 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
       }
 
       if (Object.keys(whereCondition).length === 0) {
-        
         res.status(HttpStatus.BAD_REQUEST).json({
-          message: 'Faltou buscar = >'+whereCondition,
+          message: 'Faltou buscar = >' + whereCondition,
           actionResult: false,
         } as IResponseBase<string>);
-        return
+        return;
       }
       const ordertts = await this.prisma.order_delivery.findMany({
         where: whereCondition,
