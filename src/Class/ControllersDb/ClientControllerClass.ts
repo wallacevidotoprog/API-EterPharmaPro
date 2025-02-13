@@ -35,11 +35,8 @@ export class ClientControllerClass extends BaseControllerClass<IClients> {
       const result = await this.prisma.client.findFirst  ({
         where: whereClause,        
         select: { cpf:true,c_interno:true,id:true,phone:true,name:true,  client_address: { select: { address: true } } },
-      });
+      });    
      
-      console.log('result',result);
-      
-
       if (!result) {
         res.status(HttpStatus.NOT_FOUND).json({
           actionResult: false,

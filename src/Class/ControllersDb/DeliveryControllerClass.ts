@@ -143,7 +143,7 @@ export class OrderDeliveryControllerClass extends BaseControllerClass<IOrderDeli
             order.client_id = returnClient.id;
           }
         }
-        console.log(client);
+        
         
         //ENDEREÇO
         const returnAddres = await this.prisma.address.findFirst({

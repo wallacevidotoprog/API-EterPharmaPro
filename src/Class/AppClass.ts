@@ -42,7 +42,8 @@ export class AppServer {
 
   private StartHTTPSorHTTP(): void {
     const env = process.env.NODE_ENV || 'development';
-
+    console.log('\x1b[33m[ENV]\x1b[36m',env);
+    
     if (env === 'production') {
       try {
         const options = {
@@ -58,7 +59,7 @@ export class AppServer {
       }
     } else {
       this.server = createHTTPServer(this.app);
-      console.log('\x1b[34m[HTTP]🚀 HTTP server is running in development mode\x1b[0m');
+      console.log('\x1b[33m[HTTP]🚀 HTTP server is running in development mode\x1b[0m');
     }
   }
 
