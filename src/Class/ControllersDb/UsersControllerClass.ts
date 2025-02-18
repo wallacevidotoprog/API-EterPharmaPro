@@ -63,10 +63,14 @@ export class UsersControllerClass extends BaseControllerClass<IUsers> {
   }
 
   public async GetAllUserDefault(req: Request, res: Response): Promise<void> {
+    console.log(' req.auth', req.auth.jwtNew.id);
+    
     try {
-      const users = await this.prisma.users.findMany({
+      const user = await this.prisma.users.findMany({
         select: { id: true, name: true, position: { select: { id: true, name: true } } },
       });
+      const users ={users:user,useractive:{id:req.auth.jwtNew.id, name:req.auth.jwtNew.name}} 
+      
       res.status(HttpStatus.OK).json({
         data: users,
         actionResult: true,
