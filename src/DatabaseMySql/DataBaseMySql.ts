@@ -17,7 +17,7 @@ const prisma =
       })
     : new PrismaClient();
 
-(async () => { 
+(async () => {  
   try {
     await prisma.$executeRaw`SELECT 1;`;
     console.log('\x1b[33m[PRISMA]\x1b[36m✅ PRISMA CONNECTED.');
