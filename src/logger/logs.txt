@@ -92,3 +92,11 @@ BaseControllerClass
   "clientVersion": "6.2.1"
 }
 
+[ERROR]-[2025-02-19T11:11:00.861Z]
+C:\Users\walla\source\API-EterPharmaPro\src\Class\BaseControllerClass.ts:290:12
+BaseControllerClass 
+{
+  "name": "PrismaClientInitializationError",
+  "clientVersion": "6.2.1"
+}
+
