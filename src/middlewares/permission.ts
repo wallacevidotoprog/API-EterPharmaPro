@@ -3,7 +3,7 @@ enum PermissionsEnum {
     DEV = 2,             // 00000000010
     ADMIN = 4,           // 00000000100
     SUPERVISOR = 8,      // 00000001000
-    GERENTE = 16,        // 00000010000
+    GERENTE = 16,        // 00000010000 
     FARMACEUTICO = 32,   // 00000100000
     BALCONISTA = 64,     // 00001000000
     OPERADOR_LOJA = 128, // 00010000000
